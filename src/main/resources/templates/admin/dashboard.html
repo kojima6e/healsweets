@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理者ダッシュボード - HealSweets</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/admin-style.css}">
+</head>
+<body>
+    <div th:replace="~{fragments/admin-header :: adminHeader}"></div>
+
+    <main class="admin-container">
+        <div class="admin-page-header">
+            <h1>ダッシュボード</h1>
+            <p>HealSweets 管理システム</p>
+        </div>
+
+        <!-- メッセージ表示 -->
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
+
+        <!-- 統計情報 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-content">
+                    <h3>総会員数</h3>
+                    <p class="stat-number" th:text="${stats.totalMembers}">0</p>
+                    <p class="stat-detail">有効: <span th:text="${stats.activeMembers}">0</span></p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">🛍️</div>
+                <div class="stat-content">
+                    <h3>総商品数</h3>
+                    <p class="stat-number" th:text="${stats.totalProducts}">0</p>
+                    <p class="stat-detail">販売中: <span th:text="${stats.activeProducts}">0</span></p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">📦</div>
+                <div class="stat-content">
+                    <h3>総注文数</h3>
+                    <p class="stat-number" th:text="${stats.totalOrders}">0</p>
+                    <p class="stat-detail">本日: <span th:text="${stats.todayOrders}">0</span> 件</p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-content">
+                    <h3>今月の売上</h3>
+                    <p class="stat-number">¥<span th:text="${#numbers.formatInteger(stats.monthlyRevenue, 0, 'COMMA')}">0</span></p>
+                    <p class="stat-detail">前月比較</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- クイックアクセス -->
+        <div class="quick-access">
+            <h2>クイックアクセス</h2>
+            <div class="quick-links">
+                <a th:href="@{/admin/members}" class="quick-link-card">
+                    <div class="quick-link-icon">👥</div>
+                    <h3>会員管理</h3>
+                    <p>会員の一覧・削除・復元</p>
+                </a>
+
+                <a th:href="@{/admin/products}" class="quick-link-card">
+                    <div class="quick-link-icon">🛍️</div>
+                    <h3>商品管理</h3>
+                    <p>商品の追加・編集・削除</p>
+                </a>
+
+                <a th:href="@{/admin/orders}" class="quick-link-card">
+                    <div class="quick-link-icon">📦</div>
+                    <h3>注文管理</h3>
+                    <p>注文の確認・ステータス管理</p>
+                </a>
+
+                <a th:href="@{/admin/products/new}" class="quick-link-card highlight">
+                    <div class="quick-link-icon">➕</div>
+                    <h3>新規商品追加</h3>
+                    <p>新しい商品を登録</p>
+                </a>
+            </div>
+        </div>
+
+        <!-- 最近の注文 -->
+        <div class="recent-orders">
+            <h2>最近の注文</h2>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>注文番号</th>
+                            <th>会員名</th>
+                            <th>金額</th>
+                            <th>ステータス</th>
+                            <th>注文日時</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(recentOrders)}">
+                            <td colspan="5" class="no-data">注文がありません</td>
+                        </tr>
+                        <tr th:each="order : ${recentOrders}">
+                            <td th:text="${order.orderNumber}">ORD-001</td>
+                            <td th:text="${order.member.fullName}">田中 太郎</td>
+                            <td>¥<span th:text="${#numbers.formatInteger(order.totalAmount, 0, 'COMMA')}">5,000</span></td>
+                            <td>
+                                <span class="status-badge" 
+                                      th:classappend="${#strings.toLowerCase(order.status)}" 
+                                      th:text="${order.status.displayName}">処理中</span>
+                            </td>
+                            <td th:text="${#temporals.format(order.createdAt, 'yyyy/MM/dd HH:mm')}">2025/01/01 12:00</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>

@@ -1,0 +1,982 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', 'Helvetica', sans-serif;
+    color: #333;
+    line-height: 1.6;
+    background-color: #f8f8f8;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* ヘッダー */
+header {
+    background-color: #e8d5c4;
+    padding: 15px 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-spacer {
+    width: 80px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+}
+
+.logo-image {
+    height: 60px;
+    width: auto;
+}
+
+nav {
+    display: flex;
+    gap: 30px;
+}
+
+nav a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+nav a:hover,
+nav a.active {
+    color: #4a7c59;
+}
+
+.header-icons {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.top-btn {
+    background-color: #4a7c59;
+    color: white;
+    padding: 8px 20px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.top-btn:hover {
+    background-color: #3a6349;
+    transform: translateY(-2px);
+}
+
+/* ログアウトボタン */
+.logout-form {
+    display: inline-flex;
+    margin: 0;
+    padding: 0;
+}
+
+.logout-btn {
+    background: none;
+    border: none;
+    font-size: 1.3em;
+    cursor: pointer;
+    transition: transform 0.3s;
+    padding: 0;
+}
+
+.logout-btn:hover {
+    transform: scale(1.1);
+}
+
+.logout-btn-text {
+    background-color: #e57373;
+    color: white;
+    padding: 8px 20px;
+    border-radius: 20px;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 0.95em;
+}
+
+.logout-btn-text:hover {
+    background-color: #d32f2f;
+    transform: translateY(-2px);
+}
+
+.icon {
+    font-size: 1.3em;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.icon:hover {
+    transform: scale(1.1);
+}
+
+/* 会員ページセクション */
+.member-section {
+    padding: 50px 20px;
+    min-height: calc(100vh - 200px);
+}
+
+.page-header {
+    margin-bottom: 40px;
+}
+
+.page-header h1 {
+    font-size: 2.5em;
+    color: #2d5f3f;
+    margin-bottom: 10px;
+}
+
+.welcome-text {
+    font-size: 1.1em;
+    color: #666;
+}
+
+.welcome-text strong {
+    color: #4a7c59;
+}
+
+/* メンバーコンテンツ */
+.member-content {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 30px;
+}
+
+/* サイドバーメニュー */
+.sidebar-menu {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    height: fit-content;
+    position: sticky;
+    top: 20px;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.menu-item:hover {
+    background-color: #e8f5e9;
+}
+
+.menu-item.active {
+    background-color: #4a7c59;
+    color: white;
+}
+
+.menu-icon {
+    font-size: 1.5em;
+}
+
+/* メインコンテンツ */
+.main-content {
+    background: white;
+    border-radius: 15px;
+    padding: 40px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.content-section {
+    display: none;
+}
+
+.content-section.active {
+    display: block;
+}
+
+.content-section h2 {
+    font-size: 2em;
+    color: #2d5f3f;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.section-description {
+    color: #666;
+    margin-bottom: 30px;
+    font-size: 1.05em;
+}
+
+/* 会員情報カード */
+.info-card {
+    background: #f9f9f9;
+    border-radius: 10px;
+    padding: 30px;
+    margin-bottom: 30px;
+}
+
+.info-row {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    padding: 20px 0;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-row label {
+    font-weight: 600;
+    color: #555;
+}
+
+.info-value {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.edit-btn {
+    background-color: transparent;
+    color: #4a7c59;
+    border: 2px solid #4a7c59;
+    padding: 5px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: all 0.3s;
+}
+
+.edit-btn:hover {
+    background-color: #4a7c59;
+    color: white;
+}
+
+/* アレルギーカード */
+.allergy-card {
+    background: #f9f9f9;
+    border-radius: 10px;
+    padding: 30px;
+}
+
+.allergy-card h3 {
+    font-size: 1.3em;
+    color: #2d5f3f;
+    margin-bottom: 15px;
+}
+
+.allergy-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.allergy-tag {
+    background-color: #ff5252;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.remove-tag {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 1.2em;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.allergy-form {
+    margin-top: 30px;
+    padding-top: 30px;
+    border-top: 2px solid #e0e0e0;
+}
+
+.checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    padding: 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    transition: all 0.3s;
+    background-color: white;
+}
+
+.checkbox-item:hover {
+    border-color: #4a7c59;
+    background-color: #f5f5f5;
+}
+
+.checkbox-item.selected {
+    border-color: #4a7c59;
+    background-color: #e8f5e9;
+    box-shadow: 0 0 0 3px rgba(74, 124, 89, 0.2);
+}
+
+.checkbox-item.selected span {
+    color: #2d5f3f;
+    font-weight: bold;
+}
+
+.checkbox-item input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: #4a7c59;
+}
+
+/* 退会カード */
+.warning-card {
+    background: #fff3e0;
+    border: 2px solid #ff9800;
+    border-radius: 10px;
+    padding: 40px;
+}
+
+.warning-icon {
+    font-size: 3em;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.warning-card h3 {
+    text-align: center;
+    color: #e65100;
+    margin-bottom: 20px;
+}
+
+.warning-list {
+    background: white;
+    padding: 20px 40px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+
+.warning-list li {
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.withdrawal-form {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+}
+
+.withdrawal-form label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #555;
+}
+
+.withdrawal-reason {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1em;
+    resize: vertical;
+    min-height: 120px;
+    font-family: inherit;
+    margin-bottom: 20px;
+}
+
+.confirm-checkbox {
+    margin-bottom: 20px;
+    font-weight: normal;
+}
+
+.danger-btn {
+    width: 100%;
+    background-color: #e53935;
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.danger-btn:hover:not(:disabled) {
+    background-color: #c62828;
+}
+
+.danger-btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+/* お問い合わせカード */
+.contact-card {
+    background: #f9f9f9;
+    border-radius: 10px;
+    padding: 30px;
+}
+
+.contact-form {
+    margin-bottom: 40px;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #555;
+}
+
+.form-select,
+.form-input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1em;
+    transition: border-color 0.3s;
+}
+
+.form-select:focus,
+.form-input:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: #4a7c59;
+}
+
+.form-textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1em;
+    resize: vertical;
+    min-height: 150px;
+    font-family: inherit;
+}
+
+.submit-btn {
+    background-color: #4a7c59;
+    color: white;
+    border: none;
+    padding: 12px 40px;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.submit-btn:hover {
+    background-color: #3a6349;
+    transform: translateY(-2px);
+}
+
+.contact-info {
+    padding-top: 30px;
+    border-top: 2px solid #e0e0e0;
+}
+
+.contact-info h3 {
+    font-size: 1.3em;
+    color: #2d5f3f;
+    margin-bottom: 20px;
+}
+
+.contact-method {
+    display: flex;
+    gap: 15px;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.contact-icon {
+    font-size: 2em;
+}
+
+.contact-time {
+    color: #999;
+    font-size: 0.9em;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 1024px) {
+    .member-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .sidebar-menu {
+        position: static;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .info-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .checkbox-group {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    nav {
+        gap: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-header h1 {
+        font-size: 1.8em;
+    }
+    
+    .sidebar-menu {
+        grid-template-columns: 1fr;
+    }
+    
+    .main-content {
+        padding: 20px;
+    }
+}
+
+/* 注文履歴 - 注文がない場合 */
+.no-orders-card {
+    text-align: center;
+    padding: 60px 20px;
+    background: #f9f9f9;
+    border-radius: 10px;
+}
+
+.no-orders-icon {
+    font-size: 4em;
+    margin-bottom: 20px;
+}
+
+.no-orders-card h3 {
+    font-size: 1.5em;
+    color: #2d5f3f;
+    margin-bottom: 10px;
+}
+
+.no-orders-card p {
+    color: #666;
+    margin-bottom: 25px;
+}
+
+.shop-btn {
+    display: inline-block;
+    background-color: #4a7c59;
+    color: white;
+    padding: 12px 30px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.shop-btn:hover {
+    background-color: #3a6349;
+    transform: translateY(-2px);
+}
+
+/* 注文履歴 - 注文一覧 */
+.orders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.order-card {
+    background: #f9f9f9;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: #e8f5e9;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.order-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.order-number {
+    font-size: 0.95em;
+    color: #555;
+}
+
+.order-date {
+    font-size: 0.85em;
+    color: #888;
+}
+
+.order-items {
+    padding: 20px;
+}
+
+.order-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 0;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.order-item:last-child {
+    border-bottom: none;
+}
+
+.item-image {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.item-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.item-name {
+    font-weight: 600;
+    color: #333;
+}
+
+.item-price {
+    font-size: 0.9em;
+    color: #666;
+}
+
+.item-subtotal {
+    font-weight: bold;
+    color: #2d5f3f;
+}
+
+.order-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: #fafafa;
+    border-top: 1px solid #e0e0e0;
+}
+
+.order-shipping {
+    font-size: 0.9em;
+    color: #666;
+}
+
+.order-summary {
+    text-align: right;
+}
+
+.order-shipping-fee {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.order-total {
+    font-size: 1.1em;
+}
+
+.order-total strong {
+    color: #2d5f3f;
+    font-size: 1.2em;
+}
+
+@media (max-width: 768px) {
+    .order-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .order-item .item-subtotal {
+        align-self: flex-end;
+    }
+}
+
+/* ===========================================
+   注文ステータスバッジ
+   =========================================== */
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: #f8f8f8;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.order-status {
+    flex-shrink: 0;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+
+/* 処理中 - 黄色 */
+.status-badge.pending {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
+/* 確認済み - 青 */
+.status-badge.confirmed {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+/* 発送済み - 水色 */
+.status-badge.shipped {
+    background-color: #e3f2fd;
+    color: #1565c0;
+    border: 1px solid #90caf9;
+}
+
+/* 配達完了 - 緑 */
+.status-badge.delivered {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+/* キャンセル - 赤 */
+.status-badge.cancelled {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+@media (max-width: 768px) {
+    .order-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .order-status {
+        align-self: flex-start;
+    }
+}
+
+/* ===========================================
+   会員情報編集モード
+   =========================================== */
+
+.section-header-with-button {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.section-header-with-button h2 {
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
+.edit-toggle-btn {
+    background-color: #4a7c59;
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.edit-toggle-btn:hover {
+    background-color: #3a6349;
+    transform: translateY(-2px);
+}
+
+.member-edit-form .edit-fields {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.member-edit-form .form-input,
+.member-edit-form .form-input-half,
+.member-edit-form .form-input-small {
+    padding: 10px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 1em;
+    transition: border-color 0.3s;
+}
+
+.member-edit-form .form-input {
+    flex: 1;
+    min-width: 200px;
+}
+
+.member-edit-form .form-input-half {
+    flex: 1;
+    min-width: 120px;
+}
+
+.member-edit-form .form-input-small {
+    width: 120px;
+}
+
+.member-edit-form .form-input:focus,
+.member-edit-form .form-input-half:focus,
+.member-edit-form .form-input-small:focus {
+    outline: none;
+    border-color: #4a7c59;
+}
+
+.member-edit-form .address-fields {
+    flex-direction: column;
+}
+
+.form-actions-member {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.cancel-btn {
+    background-color: #95a5a6;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.cancel-btn:hover {
+    background-color: #7f8c8d;
+}
+
+/* ===========================================
+   注文キャンセルボタン
+   =========================================== */
+
+.order-cancel-section {
+    padding: 15px 20px;
+    background: #f5f5f5;
+    border-top: 1px solid #e0e0e0;
+    text-align: right;
+}
+
+.cancel-form {
+    display: inline-block;
+}
+
+.order-cancel-btn {
+    background-color: #e53935;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 0.95em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.order-cancel-btn:hover {
+    background-color: #c62828;
+    transform: translateY(-2px);
+}
+
+.cancel-not-available {
+    color: #666;
+    font-size: 0.9em;
+}
+
+.cancel-not-available a {
+    color: #4a7c59;
+    text-decoration: underline;
+}
+
+.cancel-not-available a:hover {
+    color: #3a6349;
+}
+
+/* エラーメッセージ */
+.alert-error {
+    background-color: #ffebee;
+    color: #c62828;
+    border: 1px solid #ef9a9a;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+}

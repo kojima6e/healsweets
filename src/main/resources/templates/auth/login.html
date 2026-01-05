@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ログイン - HealSweets</title>
+    <link rel="stylesheet" th:href="@{/css/login-style.css}">
+</head>
+<body>
+    <!-- ヘッダー -->
+    <header th:replace="~{fragments/header :: headerSimple}"></header>
+
+    <!-- ログインセクション -->
+    <section class="login-section">
+        <div class="container">
+            <div class="login-container">
+                <!-- ログインフォーム -->
+                <div class="login-card">
+                    <div class="login-header">
+                        <h1>ログイン</h1>
+                        <p>HealSweetsへようこそ！</p>
+                    </div>
+
+                    <!-- メッセージ表示 -->
+                    <div th:if="${param.error}" class="alert alert-error">
+                        <p>メールアドレスまたはパスワードが正しくありません。</p>
+                    </div>
+                    <div th:if="${param.logout}" class="alert alert-success">
+                        <p>ログアウトしました。</p>
+                    </div>
+                    <div th:if="${param.withdraw}" class="alert alert-success">
+                        <p>退会処理が完了しました。ご利用ありがとうございました。</p>
+                    </div>
+                    <div th:if="${successMessage}" class="alert alert-success">
+                        <p th:text="${successMessage}">成功メッセージ</p>
+                    </div>
+
+                    <form class="login-form" th:action="@{/login}" method="post" autocomplete="off">
+                        <div class="form-group">
+                            <label>メールアドレス（ログインID）</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon">📧</span>
+                                <input type="email" class="form-input" name="email" required 
+                                       placeholder="example@email.com" autocomplete="off">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>パスワード</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon">🔒</span>
+                                <input type="password" class="form-input" name="password" id="password" 
+                                       required placeholder="パスワードを入力" autocomplete="new-password">
+                                <button type="button" class="toggle-password" onclick="togglePassword()">👁️</button>
+                            </div>
+                        </div>
+
+                        <div class="form-options">
+                            <label class="remember-me">
+                                <input type="checkbox" name="remember-me">
+                                <span>ログイン状態を保持する</span>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="login-btn">ログイン</button>
+                    </form>
+
+                    <div class="register-prompt">
+                        <p>アカウントをお持ちでない方</p>
+                        <a th:href="@{/register}" class="register-btn">新規会員登録</a>
+                    </div>
+                    
+                    <!-- テストアカウント情報 -->
+                    <div class="test-account-info">
+                        <p><strong>テストアカウント:</strong></p>
+                        <p>Email: tanaka@example.com</p>
+                        <p>Password: password123</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleBtn = document.querySelector('.toggle-password');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleBtn.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                toggleBtn.textContent = '👁️';
+            }
+        }
+
+        // ページ読み込み時にフォームをクリア
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('.login-form');
+            if (form) {
+                form.reset();
+            }
+            // 入力フィールドを明示的にクリア
+            const emailInput = document.querySelector('input[name="email"]');
+            const passwordInput = document.querySelector('input[name="password"]');
+            if (emailInput) emailInput.value = '';
+            if (passwordInput) passwordInput.value = '';
+        });
+    </script>
+    
+    <style>
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+        .alert-error {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+        }
+        .alert-success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+        }
+        .test-account-info {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fff3e0;
+            border-radius: 8px;
+            font-size: 0.9em;
+        }
+        .test-account-info p {
+            margin: 5px 0;
+        }
+    </style>
+</body>
+</html>

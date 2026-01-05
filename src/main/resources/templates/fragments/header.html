@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title} + ' - HealSweets'">HealSweets</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<!-- ヘッダー -->
+<header th:fragment="header">
+    <div class="container">
+        <div class="header-spacer"></div>
+        <div class="logo">
+            <a th:href="@{/}">
+                <img th:src="@{/images/logo.png}" alt="HealSweets" class="logo-image">
+            </a>
+        </div>
+        <div class="header-icons">
+            <!-- 未ログイン時：ログインアイコン -->
+            <a sec:authorize="!isAuthenticated()" th:href="@{/login}" class="icon login-icon" title="ログイン">🔓</a>
+            
+            <!-- ログイン時：マイページ、カート、ログアウト -->
+            <a sec:authorize="isAuthenticated()" th:href="@{/member}" class="icon" title="マイページ">👤</a>
+            <a sec:authorize="isAuthenticated()" th:href="@{/cart}" class="icon" title="カート">🛒</a>
+            <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" class="logout-form">
+                <button type="submit" class="logout-btn" title="ログアウト">🔐</button>
+            </form>
+        </div>
+    </div>
+</header>
+
+<!-- シンプルヘッダー（トップボタン付き） -->
+<header th:fragment="headerSimple">
+    <div class="container">
+        <div class="header-spacer"></div>
+        <div class="logo">
+            <a th:href="@{/}">
+                <img th:src="@{/images/logo.png}" alt="HealSweets" class="logo-image">
+            </a>
+        </div>
+        <div class="header-icons">
+            <a th:href="@{/}" class="top-btn">🏠 トップ</a>
+            <form th:action="@{/logout}" method="post" class="logout-form">
+                <button type="submit" class="logout-btn-text">🚪 ログアウト</button>
+            </form>
+        </div>
+    </div>
+</header>
+
+</body>
+</html>

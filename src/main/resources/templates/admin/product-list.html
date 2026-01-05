@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品管理 - HealSweets</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/admin-style.css}">
+</head>
+<body>
+    <div th:replace="~{fragments/admin-header :: adminHeader}"></div>
+
+    <main class="admin-container">
+        <div class="admin-page-header">
+            <div>
+                <h1>商品管理</h1>
+                <p>商品の一覧・追加・編集・削除</p>
+            </div>
+            <div class="header-actions">
+                <a th:href="@{/admin/products/new}" class="btn btn-primary">➕ 新規商品追加</a>
+            </div>
+        </div>
+
+        <!-- メッセージ表示 -->
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
+
+        <!-- 商品一覧テーブル -->
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>画像</th>
+                        <th>商品名</th>
+                        <th>価格</th>
+                        <th>カテゴリ</th>
+                        <th>在庫</th>
+                        <th>ステータス</th>
+                        <th>更新日</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(products)}">
+                        <td colspan="9" class="no-data">商品が登録されていません</td>
+                    </tr>
+                    <tr th:each="product : ${products}">
+                        <td th:text="${product.id}">1</td>
+                        <td>
+                            <img th:src="${product.imageUrl}" 
+                                 th:alt="${product.name}" 
+                                 class="product-thumbnail"
+                                 onerror="this.src='/images/logo.png'">
+                        </td>
+                        <td>
+                            <div class="product-name-cell">
+                                <strong th:text="${product.name}">商品名</strong>
+                                <small th:text="${#strings.abbreviate(product.description, 50)}">説明文...</small>
+                            </div>
+                        </td>
+                        <td class="text-right">¥<span th:text="${#numbers.formatInteger(product.price, 0, 'COMMA')}">1,000</span></td>
+                        <td>
+                            <span class="category-badge" th:text="${product.category}">カテゴリ</span>
+                        </td>
+                        <td class="text-center">
+                            <span th:class="${product.stock <= 10 ? 'stock-low' : 'stock-normal'}" 
+                                  th:text="${product.stock}">100</span>
+                        </td>
+                        <td>
+                            <span th:if="${product.active}" class="status-badge active">販売中</span>
+                            <span th:unless="${product.active}" class="status-badge inactive">停止中</span>
+                        </td>
+                        <td th:text="${#temporals.format(product.updatedAt, 'yyyy/MM/dd')}">2025/01/01</td>
+                        <td>
+                            <div class="action-buttons">
+                                <a th:href="@{/admin/products/{id}/edit(id=${product.id})}" 
+                                   class="btn btn-primary btn-sm">編集</a>
+                                
+                                <form th:if="${product.active}" 
+                                      th:action="@{/admin/products/{id}/delete(id=${product.id})}" 
+                                      method="post" 
+                                      style="display: inline;"
+                                      onsubmit="return confirm('この商品を無効化してもよろしいですか？');">
+                                    <button type="submit" class="btn btn-danger btn-sm">無効化</button>
+                                </form>
+                                
+                                <form th:unless="${product.active}" 
+                                      th:action="@{/admin/products/{id}/activate(id=${product.id})}" 
+                                      method="post" 
+                                      style="display: inline;">
+                                    <button type="submit" class="btn btn-success btn-sm">有効化</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 商品統計 -->
+        <div class="product-stats">
+            <div class="stat-item">
+                <span class="stat-label">総商品数:</span>
+                <span class="stat-value" th:text="${#lists.size(products)}">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">販売中:</span>
+                <span class="stat-value" th:text="${#lists.size(products.?[active == true])}">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">停止中:</span>
+                <span class="stat-value" th:text="${#lists.size(products.?[active == false])}">0</span>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<footer th:fragment="footer">
+    <div class="container footer-content">
+        <div class="footer-column">
+            <div class="footer-logo">
+                <a th:href="@{/}">
+                    <img th:src="@{/images/logo.png}" alt="HealSweets" class="logo-image">
+                </a>
+                <span>HealSweets</span>
+            </div>
+            <p>新鮮さを味わう</p>
+        </div>
+
+        <div class="footer-column">
+            <h4>カテゴリー</h4>
+            <ul>
+                <li><a th:href="@{/?category=all#productsSection}">すべての商品</a></li>
+                <li><a th:href="@{/?category=allergen-free#productsSection}">アレルゲンフリー</a></li>
+                <li><a th:href="@{/?category=low-sugar#productsSection}">低糖質</a></li>
+                <li><a th:href="@{/?category=cacao#productsSection}">カカオ70%</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-column">
+            <h4>会社情報</h4>
+            <ul>
+                <li><a href="#">会社概要</a></li>
+                <li><a href="#">プライバシーポリシー</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-column">
+            <h4>マイアカウント</h4>
+            <ul>
+                <li><a th:href="@{/member}">アカウント情報</a></li>
+                <li><a th:href="@{/member?section=orders}">注文履歴</a></li>
+                <li><a th:href="@{/register}">新規登録</a></li>
+                <li><a th:href="@{/login}">ログイン</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-column">
+            <h4>お問い合わせ</h4>
+            <p>📍 福岡市中央区長浜1-4-13</p>
+            <p>📞 092-401-1835</p>
+            <p>✉️ info@healsweets.com</p>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <p>Copyright © 2025 HealSweets.</p>
+    </div>
+</footer>
+
+</body>
+</html>

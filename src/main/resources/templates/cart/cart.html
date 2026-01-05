@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ショッピングカート - HealSweets</title>
+    <link rel="stylesheet" th:href="@{/css/cart-style.css}">
+</head>
+<body>
+    <!-- ヘッダー -->
+    <header>
+        <div class="container">
+            <div class="header-spacer"></div>
+            <div class="logo">
+                <a th:href="@{/}">
+                    <img th:src="@{/images/logo.png}" alt="HealSweets" class="logo-image">
+                </a>
+            </div>
+            <div class="header-icons">
+                <a th:href="@{/}" class="top-btn">🏠 トップ</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- カートページ -->
+    <section class="cart-section">
+        <div class="container">
+            <h1>ショッピングカート</h1>
+            
+            <!-- メッセージ表示 -->
+            <div th:if="${successMessage}" class="alert alert-success">
+                <p th:text="${successMessage}">成功</p>
+            </div>
+            
+            <!-- 未ログイン時のメッセージ -->
+            <div sec:authorize="!isAuthenticated()" class="login-prompt-box">
+                <p>カートを利用するには<a th:href="@{/login}">ログイン</a>してください。</p>
+                <p>アカウントをお持ちでない方は<a th:href="@{/register}">新規会員登録</a>へ</p>
+            </div>
+            
+            <!-- ログイン済みの場合 -->
+            <div sec:authorize="isAuthenticated()">
+                <!-- カートが空の場合 -->
+                <div th:if="${#lists.isEmpty(cartItems)}" class="empty-cart">
+                    <p>カートに商品がありません。</p>
+                    <a th:href="@{/}" class="continue-shopping">商品を探す</a>
+                </div>
+                
+                <!-- カートに商品がある場合 -->
+                <div th:unless="${#lists.isEmpty(cartItems)}" class="cart-content">
+                    <!-- カート商品一覧 -->
+                    <div class="cart-items">
+                        <div th:each="item : ${cartItems}" class="cart-item">
+                            <img th:src="${item.product.imageUrl}" th:alt="${item.product.name}">
+                            <div class="item-details">
+                                <h3 th:text="${item.product.name}">商品名</h3>
+                                <p class="item-category" 
+                                   th:text="${item.product.category == 'allergen-free' ? 'アレルゲンフリー' : 
+                                              (item.product.category == 'low-sugar' ? '低糖質' : 'カカオ70%')}">カテゴリー</p>
+                                <p class="item-price" th:text="${item.product.formattedPrice}">¥0</p>
+                            </div>
+                            <div class="item-quantity">
+                                <form th:action="@{/cart/update/{id}(id=${item.id})}" method="post" class="quantity-form">
+                                    <button type="submit" name="quantity" th:value="${item.quantity - 1}" class="qty-btn minus">-</button>
+                                    <span class="qty-display" th:text="${item.quantity}">1</span>
+                                    <button type="submit" name="quantity" th:value="${item.quantity + 1}" class="qty-btn plus">+</button>
+                                </form>
+                            </div>
+                            <div class="item-total">
+                                <p class="total-price" th:text="${item.formattedSubtotal}">¥0</p>
+                                <form th:action="@{/cart/remove/{id}(id=${item.id})}" method="post">
+                                    <button type="submit" class="remove-btn" 
+                                            onclick="return confirm('この商品をカートから削除しますか？')">🗑️</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- カート合計 -->
+                    <div class="cart-summary">
+                        <h2>ご注文内容</h2>
+                        
+                        <div class="summary-row">
+                            <span>小計</span>
+                            <span th:text="'¥' + ${#numbers.formatInteger(subtotal, 0, 'COMMA')}">¥0</span>
+                        </div>
+                        
+                        <div class="summary-row">
+                            <span>送料</span>
+                            <span th:text="'¥' + ${#numbers.formatInteger(shipping, 0, 'COMMA')}">¥500</span>
+                        </div>
+                        
+                        <div class="summary-divider"></div>
+                        
+                        <div class="summary-row total">
+                            <span>合計</span>
+                            <span th:text="'¥' + ${#numbers.formatInteger(total, 0, 'COMMA')}">¥0</span>
+                        </div>
+                        
+                        <a th:href="@{/checkout}" class="checkout-btn">レジに進む</a>
+                        
+                        <a th:href="@{/}" class="continue-shopping">買い物を続ける</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <style>
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+        .alert-success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+        }
+        .empty-cart {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .empty-cart p {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .login-prompt-box {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .login-prompt-box p {
+            font-size: 1.1em;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .login-prompt-box a {
+            color: #4a7c59;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .login-prompt-box a:hover {
+            text-decoration: underline;
+        }
+        .quantity-form {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background-color: #f5f5f5;
+            border-radius: 25px;
+            padding: 5px;
+        }
+        .qty-display {
+            width: 50px;
+            text-align: center;
+            font-size: 1em;
+            font-weight: bold;
+        }
+    </style>
+</body>
+</html>

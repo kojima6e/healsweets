@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>マイページ - HealSweets</title>
+    <link rel="stylesheet" th:href="@{/css/member-style.css}">
+</head>
+<body>
+    <!-- ヘッダー -->
+    <header th:replace="~{fragments/header :: headerSimple}"></header>
+
+    <!-- 会員ページコンテンツ -->
+    <section class="member-section">
+        <div class="container">
+            <div class="page-header">
+                <h1>マイページ</h1>
+                <p class="welcome-text">ようこそ、<strong th:text="${member.fullName}">田中 太郎</strong>様</p>
+            </div>
+
+            <!-- メッセージ表示 -->
+            <div th:if="${successMessage}" class="alert alert-success">
+                <p th:text="${successMessage}">成功</p>
+            </div>
+            <div th:if="${errorMessage}" class="alert alert-error">
+                <p th:text="${errorMessage}">エラー</p>
+            </div>
+
+            <div class="member-content">
+                <!-- サイドバーメニュー -->
+                <aside class="sidebar-menu">
+                    <a th:href="@{/member?section=info}" 
+                       th:classappend="${currentSection == 'info'} ? 'active' : ''"
+                       class="menu-item">
+                        <span class="menu-icon">👤</span>
+                        <span>会員情報</span>
+                    </a>
+                    <a th:href="@{/member?section=orders}" 
+                       th:classappend="${currentSection == 'orders'} ? 'active' : ''"
+                       class="menu-item">
+                        <span class="menu-icon">📦</span>
+                        <span>注文履歴</span>
+                    </a>
+                    <a th:href="@{/member?section=allergy}" 
+                       th:classappend="${currentSection == 'allergy'} ? 'active' : ''"
+                       class="menu-item">
+                        <span class="menu-icon">🥗</span>
+                        <span>アレルギー登録</span>
+                    </a>
+                    <a th:href="@{/member?section=withdrawal}" 
+                       th:classappend="${currentSection == 'withdrawal'} ? 'active' : ''"
+                       class="menu-item">
+                        <span class="menu-icon">⚠️</span>
+                        <span>退会希望の方</span>
+                    </a>
+                    <a th:href="@{/member?section=contact}" 
+                       th:classappend="${currentSection == 'contact'} ? 'active' : ''"
+                       class="menu-item">
+                        <span class="menu-icon">📧</span>
+                        <span>お問い合わせ</span>
+                    </a>
+                </aside>
+
+                <!-- メインコンテンツエリア -->
+                <main class="main-content">
+                    <!-- 会員情報セクション -->
+                    <div th:if="${currentSection == 'info'}" class="content-section active" id="info">
+                        <div class="section-header-with-button">
+                            <h2>会員情報</h2>
+                            <button type="button" class="edit-toggle-btn" onclick="toggleEditMode()">修正</button>
+                        </div>
+                        
+                        <!-- 表示モード -->
+                        <div class="info-card" id="info-view-mode">
+                            <div class="info-row">
+                                <label>お名前</label>
+                                <div class="info-value">
+                                    <span th:text="${member.fullName}">田中 太郎</span>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <label>メールアドレス</label>
+                                <div class="info-value">
+                                    <span th:text="${member.email}">example@email.com</span>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <label>電話番号</label>
+                                <div class="info-value">
+                                    <span th:text="${member.phone}">090-1234-5678</span>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <label>住所</label>
+                                <div class="info-value">
+                                    <span th:utext="${member.fullAddress}">〒123-4567 東京都渋谷区○○ 1-2-3</span>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <label>生年月日</label>
+                                <div class="info-value">
+                                    <span th:text="${#temporals.format(member.birthDate, 'yyyy年M月d日')}">1990年1月1日</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 編集モード -->
+                        <div class="info-card edit-mode" id="info-edit-mode" style="display: none;">
+                            <form th:action="@{/member/update}" method="post" class="member-edit-form">
+                                <div class="info-row">
+                                    <label>お名前</label>
+                                    <div class="edit-fields">
+                                        <input type="text" name="lastName" th:value="${member.lastName}" placeholder="姓" required class="form-input-half">
+                                        <input type="text" name="firstName" th:value="${member.firstName}" placeholder="名" required class="form-input-half">
+                                    </div>
+                                </div>
+                                <div class="info-row">
+                                    <label>電話番号</label>
+                                    <div class="edit-fields">
+                                        <input type="tel" name="phone" th:value="${member.phone}" placeholder="090-1234-5678" class="form-input">
+                                    </div>
+                                </div>
+                                <div class="info-row">
+                                    <label>住所</label>
+                                    <div class="edit-fields address-fields">
+                                        <input type="text" name="postalCode" th:value="${member.postalCode}" placeholder="郵便番号" class="form-input-small">
+                                        <input type="text" name="prefecture" th:value="${member.prefecture}" placeholder="都道府県" class="form-input-small">
+                                        <input type="text" name="city" th:value="${member.city}" placeholder="市区町村" class="form-input">
+                                        <input type="text" name="address1" th:value="${member.address1}" placeholder="番地" class="form-input">
+                                        <input type="text" name="address2" th:value="${member.address2}" placeholder="建物名・部屋番号" class="form-input">
+                                    </div>
+                                </div>
+                                <div class="info-row">
+                                    <label>生年月日</label>
+                                    <div class="edit-fields">
+                                        <input type="date" name="birthDate" th:value="${member.birthDate}" class="form-input">
+                                    </div>
+                                </div>
+                                <div class="form-actions-member">
+                                    <button type="button" class="cancel-btn" onclick="toggleEditMode()">キャンセル</button>
+                                    <button type="submit" class="submit-btn">保存</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- 注文履歴セクション -->
+                    <div th:if="${currentSection == 'orders'}" class="content-section active" id="orders">
+                        <h2>注文履歴</h2>
+                        
+                        <!-- 注文がない場合 -->
+                        <div th:if="${#lists.isEmpty(orders)}" class="no-orders-card">
+                            <div class="no-orders-icon">📦</div>
+                            <h3>購入履歴がありません</h3>
+                            <p>まだご注文がありません。商品を探してみましょう！</p>
+                            <a th:href="@{/}" class="shop-btn">商品を見る</a>
+                        </div>
+                        
+                        <!-- 注文がある場合 -->
+                        <div th:if="${!#lists.isEmpty(orders)}" class="orders-list">
+                            <div th:each="order : ${orders}" class="order-card">
+                                <div class="order-header">
+                                    <div class="order-info">
+                                        <span class="order-number">注文番号: <strong th:text="${order.orderNumber}">HS1234567890</strong></span>
+                                        <span class="order-date" th:text="${#temporals.format(order.createdAt, 'yyyy年M月d日 HH:mm')}">2025年1月1日 12:00</span>
+                                    </div>
+                                    <div class="order-status">
+                                        <span class="status-badge" 
+                                              th:classappend="${#strings.toLowerCase(order.status.name())}"
+                                              th:text="${order.status.displayName}">処理中</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="order-items">
+                                    <div th:each="item : ${order.orderItems}" class="order-item">
+                                        <img th:src="${item.product.imageUrl}" th:alt="${item.productName}" class="item-image">
+                                        <div class="item-details">
+                                            <span class="item-name" th:text="${item.productName}">商品名</span>
+                                            <span class="item-price" th:text="${item.formattedUnitPrice} + ' × ' + ${item.quantity}">¥1,000 × 2</span>
+                                        </div>
+                                        <span class="item-subtotal" th:text="${item.formattedSubtotal}">¥2,000</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="order-footer">
+                                    <div class="order-shipping">
+                                        <span>配送先: </span>
+                                        <span th:text="${order.shippingName} + '様'">田中 太郎様</span>
+                                    </div>
+                                    <div class="order-summary">
+                                        <div class="order-shipping-fee">
+                                            <span>送料: </span>
+                                            <span th:text="${order.formattedShippingFee}">¥500</span>
+                                        </div>
+                                        <div class="order-total">
+                                            <span>合計金額: </span>
+                                            <strong th:text="${order.formattedTotal}">¥3,000</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- キャンセルボタンエリア -->
+                                <!-- 処理中または確認済みの場合のみキャンセル可能 -->
+                                <div th:if="${order.status.name() == 'PENDING' || order.status.name() == 'CONFIRMED'}" class="order-cancel-section">
+                                    <form th:action="@{/member/orders/{id}/cancel(id=${order.id})}" method="post" class="cancel-form">
+                                        <button type="submit" class="order-cancel-btn" 
+                                                onclick="return confirm('この注文をキャンセルしますか？')">
+                                            注文をキャンセル
+                                        </button>
+                                    </form>
+                                </div>
+                                <!-- 発送済みの場合のみメッセージ表示（配達完了・キャンセル済みは表示しない） -->
+                                <div th:if="${order.status.name() == 'SHIPPED'}" class="order-cancel-section cancel-not-available">
+                                    <p>キャンセルはできません。詳細は<a th:href="@{/member?section=contact}">お問い合わせ</a>ください。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- アレルギー登録セクション -->
+                    <div th:if="${currentSection == 'allergy'}" class="content-section active" id="allergy">
+                        <h2>アレルギー登録</h2>
+                   
+                        
+                        <div class="allergy-card">
+                            <h3>登録済みアレルギー</h3>
+                            <div class="allergy-tags">
+                                <span th:each="allergy : ${member.allergies}" class="allergy-tag">
+                                    <span th:text="${allergy}">アレルギー</span>
+                                </span>
+                                <p th:if="${#lists.isEmpty(member.allergies)}">登録されているアレルギーはありません。</p>
+                            </div>
+
+                            <form th:action="@{/member/allergies}" method="post" class="allergy-form">
+                                <h3>アレルギーを更新</h3>
+                                <div class="checkbox-group">
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" name="allergies" value="卵" 
+                                               th:checked="${#lists.contains(member.allergies, '卵')}">
+                                        <span>卵</span>
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" name="allergies" value="小麦"
+                                               th:checked="${#lists.contains(member.allergies, '小麦')}">
+                                        <span>小麦</span>
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" name="allergies" value="乳製品"
+                                               th:checked="${#lists.contains(member.allergies, '乳製品')}">
+                                        <span>乳製品</span>
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" name="allergies" value="そば"
+                                               th:checked="${#lists.contains(member.allergies, 'そば')}">
+                                        <span>そば</span>
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" name="allergies" value="落花生"
+                                               th:checked="${#lists.contains(member.allergies, '落花生')}">
+                                        <span>落花生</span>
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" name="allergies" value="えび"
+                                               th:checked="${#lists.contains(member.allergies, 'えび')}">
+                                        <span>えび</span>
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" name="allergies" value="かに"
+                                               th:checked="${#lists.contains(member.allergies, 'かに')}">
+                                        <span>かに</span>
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" name="allergies" value="アーモンド"
+                                               th:checked="${#lists.contains(member.allergies, 'アーモンド')}">
+                                        <span>アーモンド</span>
+                                    </label>
+                                </div>
+                                <button type="submit" class="submit-btn">更新する</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- 退会希望セクション -->
+                    <div th:if="${currentSection == 'withdrawal'}" class="content-section active" id="withdrawal">
+                        <h2>退会希望の方</h2>
+                        <div class="warning-card">
+                            <div class="warning-icon">⚠️</div>
+                            <h3>退会される前にご確認ください</h3>
+                            <ul class="warning-list">
+                                <li>退会するとアカウント情報が完全に削除されます</li>
+                                <li>過去の注文履歴も閲覧できなくなります</li>
+                                <li>再登録しても同じアカウントは復元できません</li>
+                            </ul>
+
+                            <form th:action="@{/member/withdraw}" method="post" class="withdrawal-form">
+                                <label>退会理由をお聞かせください（任意）</label>
+                                <textarea name="reason" class="withdrawal-reason" placeholder="退会理由をご記入ください"></textarea>
+
+                                <label class="checkbox-item confirm-checkbox">
+                                    <input type="checkbox" id="confirm-withdrawal" required>
+                                    <span>上記の内容を理解し、退会を希望します</span>
+                                </label>
+
+                                <button type="submit" class="danger-btn" id="withdrawal-btn" 
+                                        onclick="return confirm('本当に退会しますか？この操作は取り消せません。')">
+                                    退会する
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- お問い合わせセクション -->
+                    <div th:if="${currentSection == 'contact'}" class="content-section active" id="contact">
+                        <h2>お問い合わせ</h2>
+                        <p class="section-description">ご質問やご要望がございましたら、お気軽にお問い合わせください。</p>
+                        
+                        <div class="contact-card">
+                            <form th:action="@{/member/contact}" th:object="${contactDto}" method="post" class="contact-form">
+                                <div class="form-group">
+                                    <label>お問い合わせ種別</label>
+                                    <select class="form-select" th:field="*{category}" required>
+                                        <option value="">選択してください</option>
+                                        <option value="商品について">商品について</option>
+                                        <option value="配送について">配送について</option>
+                                        <option value="返品・交換について">返品・交換について</option>
+                                        <option value="アカウントについて">アカウントについて</option>
+                                        <option value="その他">その他</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>件名</label>
+                                    <input type="text" class="form-input" th:field="*{subject}" 
+                                           placeholder="件名を入力してください" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>お問い合わせ内容</label>
+                                    <textarea class="form-textarea" th:field="*{message}" 
+                                              placeholder="お問い合わせ内容を詳しくご記入ください" required></textarea>
+                                </div>
+
+                                <button type="submit" class="submit-btn">送信する</button>
+                            </form>
+
+                            <div class="contact-info">
+                                <h3>その他のお問い合わせ方法</h3>
+                                <div class="contact-method">
+                                    <span class="contact-icon">📞</span>
+                                    <div>
+                                        <p><strong>お電話でのお問い合わせ</strong></p>
+                                        <p>TEL: 092-401-1835</p>
+                                        <p class="contact-time">受付時間: 平日 10:00-18:00</p>
+                                    </div>
+                                </div>
+                                <div class="contact-method">
+                                    <span class="contact-icon">✉️</span>
+                                    <div>
+                                        <p><strong>メールでのお問い合わせ</strong></p>
+                                        <p>support@healsweets.com</p>
+                                        <p class="contact-time">24時間受付（返信は営業時間内）</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </section>
+    
+    <style>
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+        .alert-success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+        }
+        .menu-item {
+            text-decoration: none;
+            color: inherit;
+        }
+    </style>
+
+    <script>
+        // 会員情報の編集モード切り替え
+        function toggleEditMode() {
+            const viewMode = document.getElementById('info-view-mode');
+            const editMode = document.getElementById('info-edit-mode');
+            const editBtn = document.querySelector('.edit-toggle-btn');
+            
+            if (viewMode && editMode) {
+                if (viewMode.style.display === 'none') {
+                    viewMode.style.display = 'block';
+                    editMode.style.display = 'none';
+                    editBtn.textContent = '修正';
+                } else {
+                    viewMode.style.display = 'none';
+                    editMode.style.display = 'block';
+                    editBtn.textContent = 'キャンセル';
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // アレルギーチェックボックスの選択状態を管理
+            const checkboxItems = document.querySelectorAll('.checkbox-group .checkbox-item');
+            checkboxItems.forEach(item => {
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                if (checkbox) {
+                    // 初期状態を設定
+                    if (checkbox.checked) {
+                        item.classList.add('selected');
+                    }
+                    
+                    // チェックボックス変更時に更新
+                    checkbox.addEventListener('change', function() {
+                        if (this.checked) {
+                            item.classList.add('selected');
+                        } else {
+                            item.classList.remove('selected');
+                        }
+                    });
+                    
+                    // ラベル全体をクリック可能に
+                    item.addEventListener('click', function(e) {
+                        if (e.target !== checkbox) {
+                            checkbox.checked = !checkbox.checked;
+                            checkbox.dispatchEvent(new Event('change'));
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

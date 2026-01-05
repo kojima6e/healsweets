@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理者ログイン - HealSweets</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/admin-login-style.css}">
+</head>
+<body class="admin-login-body">
+    <div class="admin-login-container">
+        <div class="admin-login-card">
+            <div class="admin-login-header">
+                <div class="admin-logo-large">
+                    <span class="admin-icon">⚙️</span>
+                    <h1>HealSweets</h1>
+                    <p>管理者ログイン</p>
+                </div>
+            </div>
+
+            <!-- エラーメッセージ -->
+            <div th:if="${param.error}" class="alert alert-error">
+                メールアドレスまたはパスワードが正しくありません。
+            </div>
+
+            <!-- ログアウトメッセージ -->
+            <div th:if="${param.logout}" class="alert alert-success">
+                ログアウトしました。
+            </div>
+
+            <!-- ログインフォーム -->
+            <form th:action="@{/login}" method="post" class="admin-login-form" autocomplete="off">
+                <input type="hidden" name="adminLogin" value="true">
+                
+                <div class="form-group">
+                    <label for="admin-email">
+                        <span class="label-icon">📧</span>
+                        メールアドレス（ログインID）
+                    </label>
+                    <input 
+                        type="email" 
+                        id="admin-email" 
+                        name="email" 
+                        class="form-control" 
+                        placeholder="example@email.com"
+                        autocomplete="new-password"
+                        required 
+                        autofocus>
+                </div>
+
+                <div class="form-group">
+                    <label for="admin-password">
+                        <span class="label-icon">🔒</span>
+                        パスワード
+                    </label>
+                    <div class="password-input-wrapper">
+                        <input 
+                            type="password" 
+                            id="admin-password" 
+                            name="password" 
+                            class="form-control" 
+                            placeholder="パスワードを入力"
+                            autocomplete="new-password"
+                            required>
+                        <button type="button" class="toggle-password" onclick="togglePassword()">👁️</button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-admin-login">
+                    <span class="btn-icon">🔐</span>
+                    管理者としてログイン
+                </button>
+            </form>
+
+            <div class="admin-login-footer">
+                <p class="admin-note">
+                    ⚠️ このページは管理者専用です
+                </p>
+                <a th:href="@{/}" class="link-to-site">
+                    <span class="link-icon">🏠</span>
+                    サイトトップへ戻る
+                </a>
+            </div>
+        </div>
+
+        <div class="admin-login-info">
+            <h2>管理者ログインについて</h2>
+            <ul>
+                <li>管理者権限を持つアカウントでログインしてください</li>
+                <li>一般ユーザーアカウントではアクセスできません</li>
+                <li>問題がある場合は、システム管理者にお問い合わせください</li>
+            </ul>
+            
+            <div class="test-account-info">
+                <h3>テスト用管理者アカウント</h3>
+                <p><strong>Email:</strong> tanaka@example.com</p>
+                <p><strong>Password:</strong> password123</p>
+                <p class="note">このアカウントは管理者権限に昇格済みです</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // パスワード表示切り替え
+        function togglePassword() {
+            var passwordInput = document.getElementById('admin-password');
+            var toggleBtn = document.querySelector('.toggle-password');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleBtn.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                toggleBtn.textContent = '👁️';
+            }
+        }
+        
+        // フォームをクリアする関数
+        function clearForm() {
+            var emailField = document.getElementById('admin-email');
+            var passwordField = document.getElementById('admin-password');
+            if (emailField) emailField.value = '';
+            if (passwordField) passwordField.value = '';
+        }
+        
+        // DOMContentLoadedとloadの両方でクリア
+        document.addEventListener('DOMContentLoaded', clearForm);
+        window.addEventListener('load', clearForm);
+        
+        // 少し遅延させてもう一度クリア（ブラウザの自動入力対策）
+        setTimeout(clearForm, 100);
+        setTimeout(clearForm, 500);
+    </script>
+    
+    <style>
+        /* パスワード入力欄のラッパー */
+        .password-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        
+        .password-input-wrapper .form-control {
+            padding-right: 50px;
+        }
+        
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2em;
+            padding: 5px;
+        }
+        
+        .toggle-password:hover {
+            opacity: 0.7;
+        }
+    </style>
+</body>
+</html>

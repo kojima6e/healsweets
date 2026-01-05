@@ -1,0 +1,817 @@
+/* 全体のリセットとフォント設定 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', 'Helvetica', sans-serif;
+    color: #333;
+    line-height: 1.6;
+    background-color: #f8f8f8;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* ヘッダー */
+header {
+    background-color: #e8d5c4;
+    padding: 15px 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-spacer {
+    width: 80px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+}
+
+.logo-image {
+    height: 60px;
+    width: auto;
+}
+
+.header-icons {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.top-btn {
+    background-color: #4a7c59;
+    color: white;
+    padding: 8px 20px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.top-btn:hover {
+    background-color: #3a6349;
+}
+
+/* ログアウトボタン */
+.logout-form {
+    display: inline-flex;
+    margin: 0;
+    padding: 0;
+}
+
+.logout-btn {
+    background: none;
+    border: none;
+    font-size: 1.3em;
+    cursor: pointer;
+    transition: transform 0.3s;
+    padding: 0;
+}
+
+.logout-btn:hover {
+    transform: scale(1.1);
+}
+
+.logout-btn-text {
+    background-color: #e57373;
+    color: white;
+    padding: 8px 20px;
+    border-radius: 20px;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 0.95em;
+}
+
+.logout-btn-text:hover {
+    background-color: #d32f2f;
+    transform: translateY(-2px);
+}
+
+/* チェックアウトセクション */
+.checkout-section {
+    padding: 50px 20px;
+    min-height: calc(100vh - 200px);
+}
+
+.checkout-section h1 {
+    font-size: 2.5em;
+    color: #2d5f3f;
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+/* ステップインジケーター */
+.step-indicator {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 50px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.step-number {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #e0e0e0;
+    color: #999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2em;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.step.active .step-number {
+    background-color: #4a7c59;
+    color: white;
+}
+
+.step-label {
+    font-size: 0.9em;
+    color: #666;
+    font-weight: 500;
+}
+
+.step.active .step-label {
+    color: #4a7c59;
+    font-weight: bold;
+}
+
+.step-line {
+    width: 80px;
+    height: 2px;
+    background-color: #e0e0e0;
+    margin: 0 10px;
+}
+
+/* チェックアウトコンテンツ */
+.checkout-content {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 40px;
+}
+
+/* メインコンテンツ */
+.checkout-main {
+    background: white;
+    border-radius: 15px;
+    padding: 40px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.checkout-step {
+    display: none;
+}
+
+.checkout-step.active {
+    display: block;
+}
+
+.checkout-step h2 {
+    font-size: 1.8em;
+    color: #2d5f3f;
+    margin-bottom: 30px;
+}
+
+.checkout-step h3 {
+    font-size: 1.3em;
+    color: #333;
+    margin-bottom: 20px;
+    margin-top: 30px;
+}
+
+/* 保存された住所 */
+.saved-address {
+    margin-bottom: 20px;
+}
+
+.address-card {
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+}
+
+.address-card:hover {
+    border-color: #4a7c59;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.address-card.selected {
+    border-color: #4a7c59;
+    background-color: #f1f8f4;
+}
+
+.address-card input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+}
+
+.address-card label {
+    cursor: pointer;
+    display: block;
+}
+
+.address-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.address-name {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #333;
+}
+
+.default-badge {
+    background-color: #4a7c59;
+    color: white;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.8em;
+}
+
+.address-detail {
+    color: #666;
+    margin: 5px 0;
+    font-size: 0.95em;
+}
+
+/* 新しい住所追加ボタン */
+.add-address-btn {
+    width: 100%;
+    padding: 15px;
+    background-color: transparent;
+    color: #4a7c59;
+    border: 2px dashed #4a7c59;
+    border-radius: 12px;
+    font-size: 1em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.add-address-btn:hover {
+    background-color: #f1f8f4;
+    border-style: solid;
+}
+
+/* 新しい住所フォーム */
+.new-address-form {
+    margin-top: 30px;
+    padding: 30px;
+    background-color: #f9f9f9;
+    border-radius: 12px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #333;
+}
+
+.required {
+    color: #e53935;
+}
+
+.form-input,
+.form-select {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1em;
+    transition: border-color 0.3s;
+}
+
+.form-input:focus,
+.form-select:focus {
+    outline: none;
+    border-color: #4a7c59;
+}
+
+/* 配送オプション */
+.delivery-options {
+    margin-top: 30px;
+}
+
+.delivery-card {
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+}
+
+.delivery-card:hover {
+    border-color: #4a7c59;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.delivery-card.selected {
+    border-color: #4a7c59;
+    background-color: #e8f5e9;
+    box-shadow: 0 0 0 3px rgba(74, 124, 89, 0.2);
+}
+
+.delivery-card.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    width: 24px;
+    height: 24px;
+    background-color: #4a7c59;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.delivery-card input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+}
+
+.delivery-card label {
+    cursor: pointer;
+    display: block;
+}
+
+.delivery-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.delivery-name {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #333;
+}
+
+.delivery-price {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #4a7c59;
+}
+
+.delivery-time {
+    color: #666;
+    font-size: 0.95em;
+}
+
+/* お支払い方法 */
+.payment-methods {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.payment-card {
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    text-align: center;
+}
+
+.payment-card:hover {
+    border-color: #4a7c59;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.payment-card.selected {
+    border-color: #4a7c59;
+    background-color: #e8f5e9;
+    box-shadow: 0 0 0 3px rgba(74, 124, 89, 0.2);
+}
+
+.payment-card.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 24px;
+    height: 24px;
+    background-color: #4a7c59;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.payment-card input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+}
+
+.payment-card label {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.payment-icon {
+    font-size: 2em;
+}
+
+.payment-name {
+    font-size: 1em;
+    font-weight: 500;
+    color: #333;
+}
+
+/* クレジットカードフォーム */
+.credit-card-form {
+    margin-top: 30px;
+    padding: 30px;
+    background-color: #f9f9f9;
+    border-radius: 12px;
+}
+
+/* 注文確認 */
+.confirmation-section {
+    margin-bottom: 30px;
+}
+
+.confirmation-box {
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.confirmation-box h4 {
+    color: #2d5f3f;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+}
+
+.confirmation-box p {
+    color: #666;
+    margin: 5px 0;
+    line-height: 1.8;
+}
+
+/* 商品確認リスト */
+.confirm-items {
+    margin-top: 15px;
+}
+
+.confirm-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background-color: white;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.confirm-item img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.item-info {
+    flex: 1;
+}
+
+.item-name {
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.item-quantity {
+    color: #666;
+    font-size: 0.9em;
+}
+
+.item-price {
+    font-weight: bold;
+    color: #4a7c59;
+    font-size: 1.1em;
+}
+
+/* 利用規約同意 */
+.terms-agreement {
+    margin: 30px 0;
+    padding: 20px;
+    background-color: #fff9e6;
+    border-radius: 12px;
+    border: 1px solid #ffe082;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.checkbox-item input[type="checkbox"] {
+    margin-top: 3px;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.checkbox-item span {
+    color: #333;
+    line-height: 1.6;
+}
+
+.checkbox-item a {
+    color: #4a7c59;
+    text-decoration: underline;
+}
+
+.checkbox-item a:hover {
+    color: #3a6349;
+}
+
+/* ボタン */
+.next-btn,
+.order-btn {
+    width: 100%;
+    padding: 15px;
+    background-color: #4a7c59;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: all 0.3s;
+}
+
+.next-btn:hover,
+.order-btn:hover {
+    background-color: #3a6349;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.button-group {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.back-btn {
+    flex: 1;
+    padding: 15px;
+    background-color: transparent;
+    color: #4a7c59;
+    border: 2px solid #4a7c59;
+    border-radius: 10px;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.back-btn:hover {
+    background-color: #e8f5e9;
+}
+
+.button-group .order-btn {
+    flex: 2;
+    margin-top: 0;
+}
+
+/* 注文サマリー */
+.order-summary {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    height: fit-content;
+    position: sticky;
+    top: 20px;
+}
+
+.order-summary h2 {
+    font-size: 1.8em;
+    color: #2d5f3f;
+    margin-bottom: 25px;
+}
+
+.summary-items {
+    margin-bottom: 20px;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    font-size: 1em;
+    color: #666;
+}
+
+.summary-divider {
+    height: 1px;
+    background-color: #e0e0e0;
+    margin: 20px 0;
+}
+
+.summary-total {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #2d5f3f;
+    margin-bottom: 20px;
+}
+
+.total-price {
+    color: #4a7c59;
+}
+
+/* プロモコード */
+.promo-section {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.promo-input {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1em;
+    outline: none;
+}
+
+.promo-input:focus {
+    border-color: #4a7c59;
+}
+
+.promo-btn {
+    padding: 12px 20px;
+    background-color: #4a7c59;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.promo-btn:hover {
+    background-color: #3a6349;
+}
+
+/* セキュリティノート */
+.security-note {
+    text-align: center;
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f1f8f4;
+    border-radius: 8px;
+}
+
+.security-note p {
+    color: #4a7c59;
+    font-size: 0.9em;
+    font-weight: 500;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 1024px) {
+    .checkout-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .order-summary {
+        position: static;
+    }
+    
+    .payment-methods {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .checkout-section h1 {
+        font-size: 2em;
+    }
+    
+    .step-indicator {
+        transform: scale(0.9);
+    }
+    
+    .step-line {
+        width: 50px;
+    }
+    
+    .checkout-main {
+        padding: 25px;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .payment-methods {
+        grid-template-columns: 1fr;
+    }
+    
+    .button-group {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 480px) {
+    .checkout-section {
+        padding: 30px 15px;
+    }
+    
+    .checkout-section h1 {
+        font-size: 1.6em;
+    }
+    
+    .checkout-main {
+        padding: 20px;
+    }
+    
+    .order-summary {
+        padding: 20px;
+    }
+    
+    .step-label {
+        font-size: 0.75em;
+    }
+    
+    .step-number {
+        width: 40px;
+        height: 40px;
+        font-size: 1em;
+    }
+    
+    .promo-section {
+        flex-direction: column;
+    }
+}

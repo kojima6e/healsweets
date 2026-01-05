@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealSweets - オンラインストア</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <!-- ヘッダー -->
+    <header>
+        <div class="container">
+            <div class="header-spacer"></div>
+            <div class="logo">
+                <a th:href="@{/}">
+                    <img th:src="@{/images/logo.png}" alt="HealSweets" class="logo-image">
+                </a>
+            </div>
+            <div class="header-icons">
+                <!-- 未ログイン時：ログインアイコン -->
+                <a sec:authorize="!isAuthenticated()" th:href="@{/login}" class="icon login-icon" title="ログイン">🔓</a>
+                
+                <!-- ログイン時：マイページ、カート、ログアウト -->
+                <a sec:authorize="isAuthenticated()" th:href="@{/member}" class="icon" title="マイページ">👤</a>
+                <a sec:authorize="isAuthenticated()" th:href="@{/cart}" class="icon" title="カート">🛒</a>
+                <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" class="logout-form">
+                    <button type="submit" class="logout-btn" title="ログアウト">🔐</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <!-- メインビジュアル（スライドショー） -->
+    <section class="hero">
+        <div class="hero-slideshow">
+            <div class="hero-slide active" th:style="'background-image: url(/images/CS_cake_1_pc.jpg);'"></div>
+            <div class="hero-slide" th:style="'background-image: url(/images/CS_cake_2_pc.jpg);'"></div>
+            <div class="hero-slide" th:style="'background-image: url(/images/CS_cake_3_pc.jpg);'"></div>
+        </div>
+    </section>
+
+    <!-- 検索バー -->
+    <div class="search-container">
+        <form th:action="@{/search}" method="get">
+            <input type="text" name="keyword" placeholder="商品を検索" class="search-input" 
+                   th:value="${keyword}">
+        </form>
+    </div>
+
+    <!-- カテゴリー -->
+    <section class="categories-section" id="categories">
+        <div class="category-grid">
+            <div th:classappend="${currentCategory == 'all' or currentCategory == null} ? 'active' : ''"
+                 class="category-card" data-category="all"
+                 th:onclick="'location.href=\'' + @{/?category=all#productsSection} + '\''">
+                <div class="category-icon">🌿</div>
+                <h3>すべて</h3>
+            </div>
+            <div th:classappend="${currentCategory == 'allergen-free'} ? 'active' : ''"
+                 class="category-card" data-category="allergen-free"
+                 th:onclick="'location.href=\'' + @{/?category=allergen-free#productsSection} + '\''">
+                <div class="category-icon">🥗</div>
+                <h3>アレルゲンフリー</h3>
+            </div>
+            <div th:classappend="${currentCategory == 'low-sugar'} ? 'active' : ''"
+                 class="category-card" data-category="low-sugar"
+                 th:onclick="'location.href=\'' + @{/?category=low-sugar#productsSection} + '\''">
+                <div class="category-icon">🍬</div>
+                <h3>低糖質</h3>
+            </div>
+            <div th:classappend="${currentCategory == 'cacao'} ? 'active' : ''"
+                 class="category-card" data-category="cacao"
+                 th:onclick="'location.href=\'' + @{/?category=cacao#productsSection} + '\''">
+                <div class="category-icon">🍫</div>
+                <h3>カカオ70%</h3>
+            </div>
+        </div>
+    </section>
+
+    <!-- 商品一覧 -->
+    <section class="products-section" id="productsSection">
+        <div class="container">
+            <div class="section-header">
+                <h2>商品一覧</h2>
+            </div>
+
+            <div class="products-grid" id="productsGrid">
+                <a th:each="product : ${products}" 
+                   th:href="@{/products/{id}(id=${product.id})}" 
+                   class="product-card"
+                   th:classappend="${product.stock <= 0} ? 'sold-out' : ''"
+                   th:data-category="${product.category}">
+                    <div class="product-image-wrapper">
+                        <img th:src="${product.imageUrl}" th:alt="${product.name}">
+                        <div th:if="${product.stock <= 0}" class="sold-out-overlay">
+                            <span class="sold-out-text">売り切れ</span>
+                        </div>
+                        <div th:if="${product.stock > 0 and product.stock <= 5}" class="low-stock-badge">
+                            <span>残り<span th:text="${product.stock}"></span>点</span>
+                        </div>
+                    </div>
+                    <h3 th:text="${product.name}">商品名</h3>
+                    <p class="price" th:text="${product.formattedPrice}">¥0</p>
+                </a>
+                
+                <p th:if="${#lists.isEmpty(products)}" class="no-products">
+                    商品が見つかりませんでした。
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- フッター -->
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+
+    <script>
+        // ヒーロースライドショー機能
+        const slides = document.querySelectorAll('.hero-slide');
+        let currentSlide = 0;
+
+        function nextSlide() {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }
+
+        // 5秒ごとにスライドを切り替え
+        if (slides.length > 1) {
+            setInterval(nextSlide, 5000);
+        }
+
+        // ページ読み込み時にハッシュがある場合、商品一覧へスムーズスクロール
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.location.hash === '#productsSection') {
+                setTimeout(function() {
+                    const productsSection = document.getElementById('productsSection');
+                    if (productsSection) {
+                        productsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }, 100);
+            }
+        });
+    </script>
+</body>
+</html>

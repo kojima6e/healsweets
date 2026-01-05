@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Header Fragment</title>
+</head>
+<body>
+
+<!-- 管理者用ヘッダー -->
+<header th:fragment="adminHeader" class="admin-header-nav">
+    <div class="admin-nav-container">
+        <div class="admin-logo">
+            <a th:href="@{/admin}">
+                <span class="admin-logo-icon">⚙️</span>
+                <span class="admin-logo-text">HealSweets 管理画面</span>
+            </a>
+        </div>
+        
+        <nav class="admin-nav">
+            <a th:href="@{/admin}" class="admin-nav-link">
+                <span class="nav-icon">📊</span>
+                <span>ダッシュボード</span>
+            </a>
+            <a th:href="@{/admin/members}" class="admin-nav-link">
+                <span class="nav-icon">👥</span>
+                <span>会員管理</span>
+            </a>
+            <a th:href="@{/admin/products}" class="admin-nav-link">
+                <span class="nav-icon">🛍️</span>
+                <span>商品管理</span>
+            </a>
+            <a th:href="@{/admin/orders}" class="admin-nav-link">
+                <span class="nav-icon">📦</span>
+                <span>注文管理</span>
+            </a>
+        </nav>
+        
+        <div class="admin-user-menu">
+            <a th:href="@{/}" class="admin-nav-link" title="サイトトップへ">
+                <span class="nav-icon">🏠</span>
+                <span>サイトへ</span>
+            </a>
+            <form th:action="@{/logout}" method="post" style="display: inline;">
+                <button type="submit" class="admin-logout-btn">
+                    <span class="nav-icon">🚪</span>
+                    <span>ログアウト</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</header>
+
+</body>
+</html>

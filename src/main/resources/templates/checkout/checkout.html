@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ご注文手続き - HealSweets</title>
+    <link rel="stylesheet" th:href="@{/css/checkout-style.css}">
+</head>
+<body>
+    <!-- ヘッダー -->
+    <header th:replace="~{fragments/header :: headerSimple}"></header>
+
+    <!-- チェックアウトセクション -->
+    <section class="checkout-section">
+        <div class="container">
+            <h1>ご注文手続き</h1>
+
+            <!-- エラーメッセージ -->
+            <div th:if="${errorMessage}" class="alert alert-error">
+                <p th:text="${errorMessage}">エラー</p>
+            </div>
+
+            <!-- ステップインジケーター -->
+            <div class="step-indicator">
+                <div class="step" th:classappend="${currentStep >= 1} ? 'active' : ''">
+                    <div class="step-number">1</div>
+                    <div class="step-label">お届け先</div>
+                </div>
+                <div class="step-line"></div>
+                <div class="step" th:classappend="${currentStep >= 2} ? 'active' : ''">
+                    <div class="step-number">2</div>
+                    <div class="step-label">お支払い方法</div>
+                </div>
+                <div class="step-line"></div>
+                <div class="step" th:classappend="${currentStep >= 3} ? 'active' : ''">
+                    <div class="step-number">3</div>
+                    <div class="step-label">注文確認</div>
+                </div>
+            </div>
+
+            <div class="checkout-content">
+                <!-- メインコンテンツ -->
+                <div class="checkout-main">
+                    <form th:action="@{${currentStep < 3 ? '/checkout/confirm' : '/checkout/complete'}}" 
+                          th:object="${checkoutDto}" method="post">
+                        
+                        <!-- ステップ1: お届け先情報 -->
+                        <div th:if="${currentStep == 1}" class="checkout-step active" id="step1">
+                            <h2>お届け先情報</h2>
+
+                            <div class="saved-address">
+                                <div class="address-card selected">
+                                    <div class="address-header">
+                                        <span class="address-name" th:text="${member.fullName}">田中 太郎</span>
+                                        <span class="default-badge">既定</span>
+                                    </div>
+                                    <p class="address-detail" th:text="'〒' + ${member.postalCode}">〒123-4567</p>
+                                    <p class="address-detail" th:text="${member.prefecture + member.city + member.address1}">東京都渋谷区○○ 1-2-3</p>
+                                    <p th:if="${member.address2}" class="address-detail" th:text="${member.address2}"></p>
+                                    <p class="address-detail" th:text="'電話: ' + ${member.phone}">電話: 090-1234-5678</p>
+                                </div>
+                            </div>
+
+                            <!-- 隠しフィールド -->
+                            <input type="hidden" th:field="*{shippingName}" th:value="${member.fullName}">
+                            <input type="hidden" th:field="*{shippingPostalCode}" th:value="${member.postalCode}">
+                            <input type="hidden" th:field="*{shippingPrefecture}" th:value="${member.prefecture}">
+                            <input type="hidden" th:field="*{shippingCity}" th:value="${member.city}">
+                            <input type="hidden" th:field="*{shippingAddress1}" th:value="${member.address1}">
+                            <input type="hidden" th:field="*{shippingAddress2}" th:value="${member.address2}">
+                            <input type="hidden" th:field="*{shippingPhone}" th:value="${member.phone}">
+
+                            <div class="delivery-options">
+                                <h3>配送オプション</h3>
+                                <div class="delivery-card selected">
+                                    <label>
+                                        <input type="radio" th:field="*{deliveryOption}" value="standard" checked>
+                                        <div class="delivery-info">
+                                            <span class="delivery-name">通常配送</span>
+                                            <span class="delivery-price">¥500</span>
+                                        </div>
+                                        <p class="delivery-time">お届け予定: 2-3営業日</p>
+                                    </label>
+                                </div>
+                                <div class="delivery-card">
+                                    <label>
+                                        <input type="radio" th:field="*{deliveryOption}" value="express">
+                                        <div class="delivery-info">
+                                            <span class="delivery-name">お急ぎ便</span>
+                                            <span class="delivery-price">¥1,000</span>
+                                        </div>
+                                        <p class="delivery-time">お届け予定: 翌日配送</p>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <h3>お支払い方法</h3>
+                            <div class="payment-methods">
+                                <div class="payment-card selected">
+                                    <label>
+                                        <input type="radio" th:field="*{paymentMethod}" value="credit" checked>
+                                        <span class="payment-icon">💳</span>
+                                        <span class="payment-name">クレジットカード</span>
+                                    </label>
+                                </div>
+                                <div class="payment-card">
+                                    <label>
+                                        <input type="radio" th:field="*{paymentMethod}" value="bank">
+                                        <span class="payment-icon">🏦</span>
+                                        <span class="payment-name">銀行振込</span>
+                                    </label>
+                                </div>
+                                <div class="payment-card">
+                                    <label>
+                                        <input type="radio" th:field="*{paymentMethod}" value="cod">
+                                        <span class="payment-icon">💵</span>
+                                        <span class="payment-name">代金引換</span>
+                                    </label>
+                                </div>
+                                <div class="payment-card">
+                                    <label>
+                                        <input type="radio" th:field="*{paymentMethod}" value="conbini">
+                                        <span class="payment-icon">🏪</span>
+                                        <span class="payment-name">コンビニ決済</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="next-btn">注文確認へ進む</button>
+                        </div>
+
+                        <!-- ステップ3: 注文確認 -->
+                        <div th:if="${currentStep == 3}" class="checkout-step active" id="step3">
+                            <h2>ご注文内容の確認</h2>
+
+                            <div class="confirmation-section">
+                                <div class="confirmation-box">
+                                    <h4>お届け先</h4>
+                                    <p th:text="${checkoutDto.shippingName}">田中 太郎</p>
+                                    <p th:text="'〒' + ${checkoutDto.shippingPostalCode}">〒123-4567</p>
+                                    <p th:text="${checkoutDto.shippingPrefecture + checkoutDto.shippingCity + checkoutDto.shippingAddress1}">住所</p>
+                                    <p th:if="${checkoutDto.shippingAddress2}" th:text="${checkoutDto.shippingAddress2}"></p>
+                                    <p th:text="'電話: ' + ${checkoutDto.shippingPhone}">電話</p>
+                                </div>
+
+                                <div class="confirmation-box">
+                                    <h4>配送方法</h4>
+                                    <p th:text="${checkoutDto.deliveryOption == 'express' ? 'お急ぎ便（翌日配送）' : '通常配送（2-3営業日）'}">通常配送</p>
+                                </div>
+
+                                <div class="confirmation-box">
+                                    <h4>お支払い方法</h4>
+                                    <p th:text="${checkoutDto.paymentMethod == 'credit' ? 'クレジットカード' : 
+                                                 (checkoutDto.paymentMethod == 'bank' ? '銀行振込' : 
+                                                 (checkoutDto.paymentMethod == 'cod' ? '代金引換' : 'コンビニ決済'))}">クレジットカード</p>
+                                </div>
+
+                                <div class="confirmation-box">
+                                    <h4>ご注文商品</h4>
+                                    <div class="confirm-items">
+                                        <div th:each="item : ${cartItems}" class="confirm-item">
+                                            <img th:src="${item.product.imageUrl}" th:alt="${item.product.name}">
+                                            <div class="item-info">
+                                                <p class="item-name" th:text="${item.product.name}">商品名</p>
+                                                <p class="item-quantity" th:text="'数量: ' + ${item.quantity}">数量: 1</p>
+                                            </div>
+                                            <p class="item-price" th:text="${item.formattedSubtotal}">¥0</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 隠しフィールド -->
+                            <input type="hidden" th:field="*{shippingName}">
+                            <input type="hidden" th:field="*{shippingPostalCode}">
+                            <input type="hidden" th:field="*{shippingPrefecture}">
+                            <input type="hidden" th:field="*{shippingCity}">
+                            <input type="hidden" th:field="*{shippingAddress1}">
+                            <input type="hidden" th:field="*{shippingAddress2}">
+                            <input type="hidden" th:field="*{shippingPhone}">
+                            <input type="hidden" th:field="*{deliveryOption}">
+                            <input type="hidden" th:field="*{paymentMethod}">
+
+                            <div class="terms-agreement">
+                                <label class="checkbox-item">
+                                    <input type="checkbox" th:field="*{agreeTerms}" required>
+                                    <span>上記の注文内容で間違いありません。<a href="#" target="_blank">利用規約</a>と<a href="#" target="_blank">キャンセルポリシー</a>に同意します。</span>
+                                </label>
+                            </div>
+
+                            <div class="button-group">
+                                <a th:href="@{/checkout}" class="back-btn">戻る</a>
+                                <button type="submit" class="order-btn">注文を確定する</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- 注文サマリー -->
+                <aside class="order-summary">
+                    <h2>ご注文内容</h2>
+
+                    <div class="summary-items">
+                        <div class="summary-item">
+                            <span>商品小計</span>
+                            <span th:text="'¥' + ${#numbers.formatInteger(subtotal, 0, 'COMMA')}">¥0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>送料</span>
+                            <span id="shippingCost" th:text="'¥' + ${#numbers.formatInteger(shipping, 0, 'COMMA')}">¥500</span>
+                        </div>
+                    </div>
+
+                    <div class="summary-divider"></div>
+
+                    <div class="summary-total">
+                        <span>合計</span>
+                        <span class="total-price" id="totalPrice" th:text="'¥' + ${#numbers.formatInteger(total, 0, 'COMMA')}">¥0</span>
+                    </div>
+
+                    <div class="security-note">
+                        <p>🔒 このサイトは安全に保護されています</p>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    <style>
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+        .alert-error {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+        }
+        .delivery-card label,
+        .payment-card label {
+            display: block;
+            cursor: pointer;
+        }
+        .delivery-card input[type="radio"],
+        .payment-card input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 配送オプションの選択状態を管理
+            const deliveryCards = document.querySelectorAll('.delivery-card');
+            deliveryCards.forEach(card => {
+                const radio = card.querySelector('input[type="radio"]');
+                if (radio) {
+                    // 初期状態を設定
+                    if (radio.checked) {
+                        card.classList.add('selected');
+                    }
+                    
+                    // クリック時の処理
+                    card.addEventListener('click', function() {
+                        deliveryCards.forEach(c => c.classList.remove('selected'));
+                        card.classList.add('selected');
+                        radio.checked = true;
+                        
+                        // 送料と合計を更新
+                        updateTotals();
+                    });
+                }
+            });
+
+            // 支払い方法の選択状態を管理
+            const paymentCards = document.querySelectorAll('.payment-card');
+            paymentCards.forEach(card => {
+                const radio = card.querySelector('input[type="radio"]');
+                if (radio) {
+                    // 初期状態を設定
+                    if (radio.checked) {
+                        card.classList.add('selected');
+                    }
+                    
+                    // クリック時の処理
+                    card.addEventListener('click', function() {
+                        paymentCards.forEach(c => c.classList.remove('selected'));
+                        card.classList.add('selected');
+                        radio.checked = true;
+                    });
+                }
+            });
+
+            // 送料と合計金額を更新
+            function updateTotals() {
+                const selectedDelivery = document.querySelector('.delivery-card.selected input[type="radio"]');
+                if (selectedDelivery) {
+                    const shippingCost = selectedDelivery.value === 'express' ? 1000 : 500;
+                    const shippingElement = document.getElementById('shippingCost');
+                    const totalElement = document.getElementById('totalPrice');
+                    
+                    if (shippingElement && totalElement) {
+                        shippingElement.textContent = '¥' + shippingCost.toLocaleString();
+                        
+                        // 現在の小計を取得して合計を計算
+                        const subtotalText = document.querySelector('.summary-item span:last-child').textContent;
+                        const subtotal = parseInt(subtotalText.replace(/[¥,]/g, ''));
+                        const total = subtotal + shippingCost;
+                        totalElement.textContent = '¥' + total.toLocaleString();
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

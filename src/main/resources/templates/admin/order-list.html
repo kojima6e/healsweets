@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注文管理 - HealSweets</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/admin-style.css}">
+</head>
+<body>
+    <div th:replace="~{fragments/admin-header :: adminHeader}"></div>
+
+    <main class="admin-container">
+        <!-- メッセージ表示 -->
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
+
+        <div class="admin-page-header">
+            <h1>注文管理</h1>
+            <p>全ての注文を確認・管理</p>
+        </div>
+
+        <!-- 注文一覧テーブル -->
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>注文番号</th>
+                        <th>会員名</th>
+                        <th>メールアドレス</th>
+                        <th>商品数</th>
+                        <th>合計金額</th>
+                        <th>支払方法</th>
+                        <th>配送オプション</th>
+                        <th>ステータス</th>
+                        <th>注文日時</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(orders)}">
+                        <td colspan="10" class="no-data">注文がありません</td>
+                    </tr>
+                    <tr th:each="order : ${orders}">
+                        <td>
+                            <strong th:text="${order.orderNumber}">ORD-001</strong>
+                        </td>
+                        <td th:text="${order.member.fullName}">田中 太郎</td>
+                        <td th:text="${order.member.email}">tanaka@example.com</td>
+                        <td class="text-center">
+                            <span th:text="${order.totalItemCount}">商品数</span>点
+                            <br>
+                            <small class="text-muted">(<span th:text="${order.itemTypeCount}"></span>種類)</small>
+                        </td>
+                        <td class="text-right">
+                            <strong>¥<span th:text="${#numbers.formatInteger(order.totalAmount, 0, 'COMMA')}">5,000</span></strong>
+                            <br>
+                            <small class="text-muted">
+                                (商品: ¥<span th:text="${#numbers.formatInteger(order.subtotal, 0, 'COMMA')}">4,500</span> + 
+                                送料: ¥<span th:text="${#numbers.formatInteger(order.shippingFee, 0, 'COMMA')}">500</span>)
+                            </small>
+                        </td>
+                        <td>
+                            <span th:switch="${order.paymentMethod}">
+                                <span th:case="'credit_card'">クレジットカード</span>
+                                <span th:case="'bank_transfer'">銀行振込</span>
+                                <span th:case="'convenience_store'">コンビニ決済</span>
+                                <span th:case="'cod'">代金引換</span>
+                                <span th:case="*" th:text="${order.paymentMethod}">-</span>
+                            </span>
+                        </td>
+                        <td>
+                            <span th:switch="${order.deliveryOption}">
+                                <span th:case="'standard'">通常配送</span>
+                                <span th:case="'express'">速達</span>
+                                <span th:case="'date_specified'">日時指定</span>
+                                <span th:case="*" th:text="${order.deliveryOption}">-</span>
+                            </span>
+                        </td>
+                        <td>
+                            <span class="status-badge" 
+                                  th:classappend="${#strings.toLowerCase(order.status)}" 
+                                  th:text="${order.status.displayName}">処理中</span>
+                        </td>
+                        <td th:text="${#temporals.format(order.createdAt, 'yyyy/MM/dd HH:mm')}">2025/01/01 12:00</td>
+                        <td>
+                            <form th:action="@{/admin/orders/{id}/status(id=${order.id})}" method="post" class="status-form">
+                                <select name="status" class="status-select" th:classappend="${#strings.toLowerCase(order.status)}">
+                                    <option th:each="s : ${statuses}" 
+                                            th:value="${s.name()}" 
+                                            th:text="${s.displayName}"
+                                            th:selected="${s == order.status}"></option>
+                                </select>
+                                <button type="submit" class="btn-update-status">更新</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 注文統計 -->
+        <div class="order-stats">
+            <div class="stat-item">
+                <span class="stat-label">総注文数:</span>
+                <span class="stat-value" th:text="${#lists.size(orders)}">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">処理待ち:</span>
+                <span class="stat-value" th:text="${#lists.size(orders.?[status.name() == 'PENDING'])}">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">発送済み:</span>
+                <span class="stat-value" th:text="${#lists.size(orders.?[status.name() == 'SHIPPED'])}">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">配達完了:</span>
+                <span class="stat-value" th:text="${#lists.size(orders.?[status.name() == 'DELIVERED'])}">0</span>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>

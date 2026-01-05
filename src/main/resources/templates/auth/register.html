@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>会員登録 - HealSweets</title>
+    <link rel="stylesheet" th:href="@{/css/register-style.css}">
+</head>
+<body>
+    <!-- ヘッダー -->
+    <header th:replace="~{fragments/header :: headerSimple}"></header>
+
+    <!-- 登録フォームセクション -->
+    <section class="register-section">
+        <div class="container">
+            <div class="register-container">
+                <div class="register-header">
+                    <h1>会員登録</h1>
+                    <p>HealSweetsへようこそ！新規アカウントを作成してください。</p>
+                </div>
+
+                <!-- エラーメッセージ -->
+                <div th:if="${errorMessage}" class="alert alert-error">
+                    <p th:text="${errorMessage}">エラー</p>
+                </div>
+
+                <form class="register-form" id="registerForm" th:action="@{/register}" 
+                      th:object="${memberDto}" method="post">
+                    
+                    <!-- ステップインジケーター -->
+                    <div class="step-indicator">
+                        <div class="step active" id="stepIndicator1">
+                            <div class="step-number">1</div>
+                            <div class="step-label">基本情報</div>
+                        </div>
+                        <div class="step-line"></div>
+                        <div class="step" id="stepIndicator2">
+                            <div class="step-number">2</div>
+                            <div class="step-label">住所情報</div>
+                        </div>
+                        <div class="step-line"></div>
+                        <div class="step" id="stepIndicator3">
+                            <div class="step-number">3</div>
+                            <div class="step-label">アレルギー情報</div>
+                        </div>
+                    </div>
+
+                    <!-- ステップ1: 基本情報 -->
+                    <div class="form-step active" id="step1">
+                        <h2>基本情報の入力</h2>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>姓 <span class="required">*</span></label>
+                                <input type="text" class="form-input" th:field="*{lastName}" 
+                                       required placeholder="山田"
+                                       th:classappend="${#fields.hasErrors('lastName')} ? 'error' : ''">
+                                <span class="error-message" th:if="${#fields.hasErrors('lastName')}" 
+                                      th:errors="*{lastName}"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>名 <span class="required">*</span></label>
+                                <input type="text" class="form-input" th:field="*{firstName}" 
+                                       required placeholder="太郎"
+                                       th:classappend="${#fields.hasErrors('firstName')} ? 'error' : ''">
+                                <span class="error-message" th:if="${#fields.hasErrors('firstName')}" 
+                                      th:errors="*{firstName}"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>メールアドレス <span class="required">*</span></label>
+                            <input type="email" class="form-input" th:field="*{email}" 
+                                   required placeholder="example@email.com"
+                                   th:classappend="${#fields.hasErrors('email')} ? 'error' : ''">
+                            <small class="form-hint">ログインIDとして使用されます</small>
+                            <span class="error-message" th:if="${#fields.hasErrors('email')}" 
+                                  th:errors="*{email}"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>パスワード <span class="required">*</span></label>
+                            <input type="password" class="form-input" th:field="*{password}" 
+                                   required placeholder="8文字以上"
+                                   th:classappend="${#fields.hasErrors('password')} ? 'error' : ''">
+                            <small class="form-hint">英数字を含む8文字以上で設定してください</small>
+                            <span class="error-message" th:if="${#fields.hasErrors('password')}" 
+                                  th:errors="*{password}"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>パスワード（確認） <span class="required">*</span></label>
+                            <input type="password" class="form-input" th:field="*{passwordConfirm}" 
+                                   required placeholder="もう一度入力してください"
+                                   th:classappend="${#fields.hasErrors('passwordConfirm')} ? 'error' : ''">
+                            <span class="error-message" th:if="${#fields.hasErrors('passwordConfirm')}" 
+                                  th:errors="*{passwordConfirm}"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>電話番号 <span class="required">*</span></label>
+                            <input type="tel" class="form-input" th:field="*{phone}" 
+                                   required placeholder="090-1234-5678">
+                        </div>
+
+                        <div class="form-group">
+                            <label>生年月日 <span class="required">*</span></label>
+                            <input type="date" class="form-input" th:field="*{birthDate}" required>
+                        </div>
+
+                        <button type="button" class="next-btn" onclick="nextStep(2)">次へ進む</button>
+                    </div>
+
+                    <!-- ステップ2: 住所情報 -->
+                    <div class="form-step" id="step2">
+                        <h2>住所情報の入力</h2>
+
+                        <div class="form-group">
+                            <label>郵便番号 <span class="required">*</span></label>
+                            <div class="postal-input">
+                                <input type="text" class="form-input" th:field="*{postalCode}" 
+                                       required placeholder="123-4567">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>都道府県 <span class="required">*</span></label>
+                            <select class="form-select" th:field="*{prefecture}" required>
+                                <option value="">選択してください</option>
+                                <option value="北海道">北海道</option>
+                                <option value="青森県">青森県</option>
+                                <option value="岩手県">岩手県</option>
+                                <option value="宮城県">宮城県</option>
+                                <option value="秋田県">秋田県</option>
+                                <option value="山形県">山形県</option>
+                                <option value="福島県">福島県</option>
+                                <option value="茨城県">茨城県</option>
+                                <option value="栃木県">栃木県</option>
+                                <option value="群馬県">群馬県</option>
+                                <option value="埼玉県">埼玉県</option>
+                                <option value="千葉県">千葉県</option>
+                                <option value="東京都">東京都</option>
+                                <option value="神奈川県">神奈川県</option>
+                                <option value="新潟県">新潟県</option>
+                                <option value="富山県">富山県</option>
+                                <option value="石川県">石川県</option>
+                                <option value="福井県">福井県</option>
+                                <option value="山梨県">山梨県</option>
+                                <option value="長野県">長野県</option>
+                                <option value="岐阜県">岐阜県</option>
+                                <option value="静岡県">静岡県</option>
+                                <option value="愛知県">愛知県</option>
+                                <option value="三重県">三重県</option>
+                                <option value="滋賀県">滋賀県</option>
+                                <option value="京都府">京都府</option>
+                                <option value="大阪府">大阪府</option>
+                                <option value="兵庫県">兵庫県</option>
+                                <option value="奈良県">奈良県</option>
+                                <option value="和歌山県">和歌山県</option>
+                                <option value="鳥取県">鳥取県</option>
+                                <option value="島根県">島根県</option>
+                                <option value="岡山県">岡山県</option>
+                                <option value="広島県">広島県</option>
+                                <option value="山口県">山口県</option>
+                                <option value="徳島県">徳島県</option>
+                                <option value="香川県">香川県</option>
+                                <option value="愛媛県">愛媛県</option>
+                                <option value="高知県">高知県</option>
+                                <option value="福岡県">福岡県</option>
+                                <option value="佐賀県">佐賀県</option>
+                                <option value="長崎県">長崎県</option>
+                                <option value="熊本県">熊本県</option>
+                                <option value="大分県">大分県</option>
+                                <option value="宮崎県">宮崎県</option>
+                                <option value="鹿児島県">鹿児島県</option>
+                                <option value="沖縄県">沖縄県</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>市区町村 <span class="required">*</span></label>
+                            <input type="text" class="form-input" th:field="*{city}" 
+                                   required placeholder="渋谷区">
+                        </div>
+
+                        <div class="form-group">
+                            <label>番地 <span class="required">*</span></label>
+                            <input type="text" class="form-input" th:field="*{address1}" 
+                                   required placeholder="1-2-3">
+                        </div>
+
+                        <div class="form-group">
+                            <label>建物名・部屋番号</label>
+                            <input type="text" class="form-input" th:field="*{address2}" 
+                                   placeholder="○○マンション 101号室">
+                        </div>
+
+                        <div class="button-group">
+                            <button type="button" class="back-btn" onclick="prevStep(1)">戻る</button>
+                            <button type="button" class="next-btn" onclick="nextStep(3)">次へ進む</button>
+                        </div>
+                    </div>
+
+                    <!-- ステップ3: アレルギー情報 -->
+                    <div class="form-step" id="step3">
+                        <h2>アレルギー情報の登録</h2>
+                        <p class="step-description">該当するアレルギーがあれば選択してください（任意）</p>
+
+                        <div class="allergy-section">
+                            <h3>アレルギー品目（特定原材料8品目）</h3>
+                            <div class="checkbox-grid">
+                                <label class="checkbox-card">
+                                    <input type="checkbox" name="allergies" value="卵">
+                                    <div class="checkbox-content">
+                                        <span class="allergy-icon">🥚</span>
+                                        <span class="allergy-name">卵</span>
+                                    </div>
+                                </label>
+                                <label class="checkbox-card">
+                                    <input type="checkbox" name="allergies" value="小麦">
+                                    <div class="checkbox-content">
+                                        <span class="allergy-icon">🌾</span>
+                                        <span class="allergy-name">小麦</span>
+                                    </div>
+                                </label>
+                                <label class="checkbox-card">
+                                    <input type="checkbox" name="allergies" value="乳製品">
+                                    <div class="checkbox-content">
+                                        <span class="allergy-icon">🥛</span>
+                                        <span class="allergy-name">乳製品</span>
+                                    </div>
+                                </label>
+                                <label class="checkbox-card">
+                                    <input type="checkbox" name="allergies" value="そば">
+                                    <div class="checkbox-content">
+                                        <span class="allergy-icon">🍜</span>
+                                        <span class="allergy-name">そば</span>
+                                    </div>
+                                </label>
+                                <label class="checkbox-card">
+                                    <input type="checkbox" name="allergies" value="落花生">
+                                    <div class="checkbox-content">
+                                        <span class="allergy-icon">🥜</span>
+                                        <span class="allergy-name">落花生</span>
+                                    </div>
+                                </label>
+                                <label class="checkbox-card">
+                                    <input type="checkbox" name="allergies" value="えび">
+                                    <div class="checkbox-content">
+                                        <span class="allergy-icon">🦐</span>
+                                        <span class="allergy-name">えび</span>
+                                    </div>
+                                </label>
+                                <label class="checkbox-card">
+                                    <input type="checkbox" name="allergies" value="かに">
+                                    <div class="checkbox-content">
+                                        <span class="allergy-icon">🦀</span>
+                                        <span class="allergy-name">かに</span>
+                                    </div>
+                                </label>
+                                <label class="checkbox-card">
+                                    <input type="checkbox" name="allergies" value="アーモンド">
+                                    <div class="checkbox-content">
+                                        <span class="allergy-icon">🌰</span>
+                                        <span class="allergy-name">アーモンド</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="terms-section">
+                            <label class="checkbox-item terms-checkbox">
+                                <input type="checkbox" th:field="*{agreeTerms}" required>
+                                <span><a href="#terms" target="_blank">利用規約</a>と<a href="#privacy" target="_blank">プライバシーポリシー</a>に同意します <span class="required">*</span></span>
+                            </label>
+                            <span class="error-message" th:if="${#fields.hasErrors('agreeTerms')}" 
+                                  th:errors="*{agreeTerms}"></span>
+
+                            <label class="checkbox-item">
+                                <input type="checkbox" th:field="*{newsletter}">
+                                <span>メールマガジンを受け取る（新商品やお得な情報をお届けします）</span>
+                            </label>
+                        </div>
+
+                        <div class="button-group">
+                            <button type="button" class="back-btn" onclick="prevStep(2)">戻る</button>
+                            <button type="submit" class="submit-btn">登録する</button>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="login-prompt">
+                    <p>すでにアカウントをお持ちの方は<a th:href="@{/login}">こちらからログイン</a></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        function nextStep(stepNumber) {
+            const currentStep = document.querySelector('.form-step.active');
+            const inputs = currentStep.querySelectorAll('input[required], select[required]');
+            let isValid = true;
+
+            inputs.forEach(input => {
+                if (!input.value) {
+                    isValid = false;
+                    input.classList.add('error');
+                } else {
+                    input.classList.remove('error');
+                }
+            });
+
+            if (stepNumber === 2) {
+                const password = document.querySelector('input[name="password"]').value;
+                const passwordConfirm = document.querySelector('input[name="passwordConfirm"]').value;
+                if (password !== passwordConfirm) {
+                    alert('パスワードが一致しません。');
+                    return;
+                }
+            }
+
+            if (!isValid) {
+                alert('必須項目をすべて入力してください。');
+                return;
+            }
+
+            document.querySelectorAll('.form-step').forEach(step => step.classList.remove('active'));
+            document.getElementById('step' + stepNumber).classList.add('active');
+
+            document.querySelectorAll('.step-indicator .step').forEach((step, index) => {
+                if (index < stepNumber) step.classList.add('active');
+                else step.classList.remove('active');
+            });
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function prevStep(stepNumber) {
+            document.querySelectorAll('.form-step').forEach(step => step.classList.remove('active'));
+            document.getElementById('step' + stepNumber).classList.add('active');
+
+            document.querySelectorAll('.step-indicator .step').forEach((step, index) => {
+                if (index < stepNumber) step.classList.add('active');
+                else step.classList.remove('active');
+            });
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // チェックボックスカードの選択状態を視覚的に更新
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkboxCards = document.querySelectorAll('.checkbox-card input[type="checkbox"]');
+            checkboxCards.forEach(checkbox => {
+                // 初期状態を設定
+                updateCardState(checkbox);
+                
+                // 変更時に更新
+                checkbox.addEventListener('change', function() {
+                    updateCardState(this);
+                });
+            });
+
+            function updateCardState(checkbox) {
+                const card = checkbox.closest('.checkbox-card');
+                if (checkbox.checked) {
+                    card.classList.add('selected');
+                } else {
+                    card.classList.remove('selected');
+                }
+            }
+        });
+    </script>
+    
+    <style>
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+        .alert-error {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+        }
+        .error-message {
+            color: #c62828;
+            font-size: 0.85em;
+            display: block;
+            margin-top: 5px;
+        }
+        .form-input.error, .form-select.error {
+            border-color: #c62828;
+        }
+        /* チェックボックスカード選択時のスタイル */
+        .checkbox-card.selected {
+            border-color: #4a7c59;
+            background-color: #e8f5e9;
+            box-shadow: 0 0 0 3px rgba(74, 124, 89, 0.2);
+        }
+        .checkbox-card.selected .checkbox-content {
+            color: #2d5f3f;
+        }
+        .checkbox-card.selected .allergy-icon {
+            transform: scale(1.2);
+        }
+        .checkbox-card.selected .allergy-name {
+            font-weight: bold;
+        }
+    </style>
+</body>
+</html>
