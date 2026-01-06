@@ -7,6 +7,48 @@
     <title>HealSweets - オンラインストア</title>
     <link rel="icon" type="image/png" th:href="@{/images/favicon.png}">
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        /* カテゴリー複数選択用スタイル */
+        .category-card {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .category-card.selected {
+            background-color: #e8f5e9;
+            border-color: #4a7c59;
+            box-shadow: 0 0 0 3px rgba(74, 124, 89, 0.2);
+        }
+        
+        .category-card.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #4a7c59;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .filter-info {
+            text-align: center;
+            margin-top: 15px;
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .filter-info .selected-count {
+            font-weight: bold;
+            color: #4a7c59;
+        }
+    </style>
 </head>
 <body>
     <!-- ヘッダー -->
@@ -49,33 +91,38 @@
         </form>
     </div>
 
-    <!-- カテゴリー -->
+    <!-- カテゴリー（複数選択可能・AND検索） -->
     <section class="categories-section" id="categories">
         <div class="category-grid">
-            <div th:classappend="${currentCategory == 'all' or currentCategory == null} ? 'active' : ''"
-                 class="category-card" data-category="all"
-                 th:onclick="'location.href=\'' + @{/?category=all#productsSection} + '\''">
+            <div th:classappend="${#lists.isEmpty(selectedCategories)} ? 'selected' : ''"
+                 class="category-card" data-category="all">
                 <div class="category-icon">🌿</div>
                 <h3>すべて</h3>
             </div>
-            <div th:classappend="${currentCategory == 'allergen-free'} ? 'active' : ''"
-                 class="category-card" data-category="allergen-free"
-                 th:onclick="'location.href=\'' + @{/?category=allergen-free#productsSection} + '\''">
+            <div th:classappend="${selectedCategories.contains('allergen-free')} ? 'selected' : ''"
+                 class="category-card" data-category="allergen-free">
                 <div class="category-icon">🥗</div>
                 <h3>アレルゲンフリー</h3>
             </div>
-            <div th:classappend="${currentCategory == 'low-sugar'} ? 'active' : ''"
-                 class="category-card" data-category="low-sugar"
-                 th:onclick="'location.href=\'' + @{/?category=low-sugar#productsSection} + '\''">
+            <div th:classappend="${selectedCategories.contains('low-sugar')} ? 'selected' : ''"
+                 class="category-card" data-category="low-sugar">
                 <div class="category-icon">🍬</div>
                 <h3>低糖質</h3>
             </div>
-            <div th:classappend="${currentCategory == 'cacao'} ? 'active' : ''"
-                 class="category-card" data-category="cacao"
-                 th:onclick="'location.href=\'' + @{/?category=cacao#productsSection} + '\''">
+            <div th:classappend="${selectedCategories.contains('cacao')} ? 'selected' : ''"
+                 class="category-card" data-category="cacao">
                 <div class="category-icon">🍫</div>
                 <h3>カカオ70%</h3>
             </div>
+        </div>
+        
+        <div class="filter-info">
+            <span id="filterStatus">
+                <span th:if="${#lists.isEmpty(selectedCategories)}">すべての商品を表示中</span>
+                <span th:unless="${#lists.isEmpty(selectedCategories)}">
+                    <span class="selected-count" th:text="${#lists.size(selectedCategories)}">0</span>件のカテゴリーで絞り込み中（すべて満たす商品を表示）
+                </span>
+            </span>
         </div>
     </section>
 
@@ -131,8 +178,48 @@
             setInterval(nextSlide, 5000);
         }
 
-        // ページ読み込み時にハッシュがある場合、商品一覧へスムーズスクロール
+        // カテゴリー選択機能（選択時に自動で絞り込み）
         document.addEventListener('DOMContentLoaded', function() {
+            const categoryCards = document.querySelectorAll('.category-card');
+            
+            // カテゴリーカードのクリックイベント
+            categoryCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const category = this.dataset.category;
+                    
+                    if (category === 'all') {
+                        // 「すべて」をクリック → 全商品表示
+                        window.location.href = '/#productsSection';
+                    } else {
+                        // カテゴリーをトグルして即座に絞り込み
+                        const isSelected = this.classList.contains('selected');
+                        
+                        // 現在選択されているカテゴリーを取得
+                        let selectedCategories = [];
+                        document.querySelectorAll('.category-card.selected:not([data-category="all"])').forEach(c => {
+                            selectedCategories.push(c.dataset.category);
+                        });
+                        
+                        if (isSelected) {
+                            // 選択解除
+                            selectedCategories = selectedCategories.filter(c => c !== category);
+                        } else {
+                            // 選択追加
+                            selectedCategories.push(category);
+                        }
+                        
+                        // URLを構築してリダイレクト
+                        if (selectedCategories.length === 0) {
+                            window.location.href = '/#productsSection';
+                        } else {
+                            const params = selectedCategories.map(c => 'categories=' + encodeURIComponent(c)).join('&');
+                            window.location.href = '/?' + params + '#productsSection';
+                        }
+                    }
+                });
+            });
+            
+            // ページ読み込み時にハッシュがある場合、商品一覧へスムーズスクロール
             if (window.location.hash === '#productsSection') {
                 setTimeout(function() {
                     const productsSection = document.getElementById('productsSection');

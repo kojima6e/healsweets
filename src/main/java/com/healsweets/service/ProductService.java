@@ -49,14 +49,39 @@ public class ProductService {
     }
 
     public List<Product> findAllActive() {
-        return productRepository.findByActiveTrue();
+        return productRepository.findByActiveTrueOrderByIdAsc();
     }
 
+    /**
+     * カテゴリーで商品を検索（複数カテゴリー対応）
+     * まず新しいcategoriesコレクションで検索し、結果がなければ旧categoryカラムでも検索
+     */
     public List<Product> findByCategory(String category) {
         if (category == null || category.isEmpty() || "all".equalsIgnoreCase(category)) {
             return findAllActive();
         }
-        return productRepository.findByCategoryAndActiveTrue(category);
+        
+        // 新しい複数カテゴリーテーブルで検索
+        List<Product> products = productRepository.findByCategoriesContainingAndActiveTrue(category);
+        
+        // 結果がなければ旧categoryカラムでも検索（後方互換性）
+        if (products.isEmpty()) {
+            products = productRepository.findByCategoryAndActiveTrue(category);
+        }
+        
+        return products;
+    }
+
+    /**
+     * 複数カテゴリーで商品を検索（AND検索）
+     * 指定されたカテゴリーをすべて持つ商品を返す
+     */
+    public List<Product> findByCategories(List<String> categories) {
+        if (categories == null || categories.isEmpty()) {
+            return findAllActive();
+        }
+        
+        return productRepository.findByCategoriesAllAndActiveTrueOrderByIdAsc(categories, (long) categories.size());
     }
 
     public Optional<Product> findById(Long id) {

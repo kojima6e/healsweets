@@ -591,6 +591,100 @@
     cursor: pointer;
 }
 
+/* ===========================================
+   チェックボックスカード（カテゴリー・アレルゲン・特徴選択用）
+   =========================================== */
+.checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.checkbox-card {
+    display: block;
+    cursor: pointer;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 20px 15px;
+    text-align: center;
+    transition: all 0.3s ease;
+    background: white;
+    position: relative;
+}
+
+.checkbox-card:hover {
+    border-color: #667eea;
+    background-color: #f8f9ff;
+}
+
+/* チェックボックスを非表示 */
+.checkbox-card input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* 選択時のカードスタイル */
+.checkbox-card.selected {
+    border-color: #667eea;
+    background-color: #e8eaff;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+}
+
+.checkbox-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    pointer-events: none;
+}
+
+.category-icon {
+    font-size: 2.2em;
+    transition: transform 0.3s ease;
+}
+
+.checkbox-card.selected .category-icon {
+    transform: scale(1.15);
+}
+
+.category-name {
+    font-size: 0.95em;
+    color: #333;
+    font-weight: 500;
+}
+
+.checkbox-card.selected .category-name {
+    color: #4a5568;
+    font-weight: bold;
+}
+
+/* チェックマーク表示 */
+.checkbox-card::after {
+    content: '';
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: #e0e0e0;
+    transition: all 0.3s ease;
+}
+
+.checkbox-card.selected::after {
+    content: '✓';
+    background-color: #667eea;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+}
+
 /* フォームアクション */
 .form-actions {
     display: flex;

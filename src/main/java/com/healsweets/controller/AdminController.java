@@ -140,7 +140,7 @@ public class AdminController {
                 .name(product.getName())
                 .description(product.getDescription())
                 .price(product.getPrice())
-                .category(product.getCategory())
+                .categories(product.getCategories())
                 .imageUrl(product.getImageUrl())
                 .quantity(product.getQuantity())
                 .expiryDays(product.getExpiryDays())

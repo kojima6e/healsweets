@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +59,7 @@ public class AdminService {
 
     @Transactional(readOnly = true)
     public List<Product> getAllProducts() {
-        return productRepository.findAll();
+        return productRepository.findAllByOrderByIdAsc();
     }
 
     @Transactional(readOnly = true)
@@ -69,17 +70,22 @@ public class AdminService {
 
     @Transactional
     public Product createProduct(ProductAdminDto dto) {
+        // 空の値を除外したリストを作成
+        List<String> categories = filterEmptyStrings(dto.getCategories());
+        List<String> allergens = filterEmptyStrings(dto.getAllergens());
+        List<String> features = filterEmptyStrings(dto.getFeatures());
+
         Product product = Product.builder()
                 .name(dto.getName())
                 .description(dto.getDescription())
                 .price(dto.getPrice())
-                .category(dto.getCategory())
+                .categories(categories)
                 .imageUrl(dto.getImageUrl())
                 .quantity(dto.getQuantity())
                 .expiryDays(dto.getExpiryDays())
                 .storageMethod(dto.getStorageMethod())
-                .allergens(dto.getAllergens())
-                .features(dto.getFeatures())
+                .allergens(allergens)
+                .features(features)
                 .stock(dto.getStock())
                 .active(dto.getActive())
                 .build();
@@ -95,7 +101,6 @@ public class AdminService {
         product.setName(dto.getName());
         product.setDescription(dto.getDescription());
         product.setPrice(dto.getPrice());
-        product.setCategory(dto.getCategory());
         product.setImageUrl(dto.getImageUrl());
         product.setQuantity(dto.getQuantity());
         product.setExpiryDays(dto.getExpiryDays());
@@ -103,18 +108,31 @@ public class AdminService {
         product.setStock(dto.getStock());
         product.setActive(dto.getActive());
 
-        // ElementCollectionの更新
-        product.getAllergens().clear();
-        if (dto.getAllergens() != null) {
-            product.getAllergens().addAll(dto.getAllergens());
-        }
+        // ElementCollectionの更新: カテゴリー（空の値を除外）
+        product.getCategories().clear();
+        product.getCategories().addAll(filterEmptyStrings(dto.getCategories()));
 
+        // ElementCollectionの更新: アレルゲン（空の値を除外）
+        product.getAllergens().clear();
+        product.getAllergens().addAll(filterEmptyStrings(dto.getAllergens()));
+
+        // ElementCollectionの更新: 特徴（空の値を除外）
         product.getFeatures().clear();
-        if (dto.getFeatures() != null) {
-            product.getFeatures().addAll(dto.getFeatures());
-        }
+        product.getFeatures().addAll(filterEmptyStrings(dto.getFeatures()));
 
         return productRepository.save(product);
+    }
+
+    /**
+     * リストから空文字・null・空白のみの値を除外
+     */
+    private List<String> filterEmptyStrings(List<String> list) {
+        if (list == null) {
+            return new ArrayList<>();
+        }
+        return list.stream()
+                .filter(s -> s != null && !s.trim().isEmpty())
+                .collect(java.util.stream.Collectors.toList());
     }
 
     @Transactional

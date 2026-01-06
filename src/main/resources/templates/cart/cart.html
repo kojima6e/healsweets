@@ -56,9 +56,8 @@
                             <img th:src="${item.product.imageUrl}" th:alt="${item.product.name}">
                             <div class="item-details">
                                 <h3 th:text="${item.product.name}">商品名</h3>
-                                <p class="item-category" 
-                                   th:text="${item.product.category == 'allergen-free' ? 'アレルゲンフリー' : 
-                                              (item.product.category == 'low-sugar' ? '低糖質' : 'カカオ70%')}">カテゴリー</p>
+                                <!-- 複数カテゴリー対応 -->
+                                <p class="item-category" th:text="${item.product.categoriesDisplay}">カテゴリー</p>
                                 <p class="item-price" th:text="${item.product.formattedPrice}">¥0</p>
                             </div>
                             <div class="item-quantity">

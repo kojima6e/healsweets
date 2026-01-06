@@ -29,8 +29,9 @@ public class ProductAdminDto {
     @DecimalMin(value = "0", message = "価格は0円以上で入力してください")
     private BigDecimal price;
 
-    @Size(max = 50, message = "カテゴリは50文字以内で入力してください")
-    private String category;
+    // 複数カテゴリー対応
+    @Builder.Default
+    private List<String> categories = new ArrayList<>();
 
     @Size(max = 500, message = "画像URLは500文字以内で入力してください")
     private String imageUrl;

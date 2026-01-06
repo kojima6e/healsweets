@@ -17,9 +17,14 @@
         <div class="container">
             <a th:href="@{/}">ホーム</a>
             <span class="separator">›</span>
-            <a th:href="@{/?category={cat}(cat=${product.category})}" 
-               th:text="${product.category == 'allergen-free' ? 'アレルゲンフリー' : 
-                          (product.category == 'low-sugar' ? '低糖質' : 'カカオ70%')}">カテゴリー</a>
+            <!-- 複数カテゴリー対応: 最初のカテゴリーをリンクに使用 -->
+            <a th:if="${!#lists.isEmpty(product.categories)}" 
+               th:href="@{/?category={cat}(cat=${product.categories[0]})}" 
+               th:text="${product.categoriesDisplay}">カテゴリー</a>
+            <!-- 後方互換: 旧categoryカラム用 -->
+            <a th:if="${#lists.isEmpty(product.categories) and product.category != null}" 
+               th:href="@{/?category={cat}(cat=${product.category})}" 
+               th:text="${product.categoriesDisplay}">カテゴリー</a>
             <span class="separator">›</span>
             <span class="current" th:text="${product.name}">商品名</span>
         </div>
@@ -46,9 +51,8 @@
                     <div th:if="${product.stock > 0 and product.stock <= 5}" class="low-stock-banner">
                         <span>残り<span th:text="${product.stock}"></span>点</span>
                     </div>
-                    <div class="product-category-tag" 
-                         th:text="${product.category == 'allergen-free' ? 'アレルゲンフリー' : 
-                                   (product.category == 'low-sugar' ? '低糖質' : 'カカオ70%')}">カテゴリー</div>
+                    <!-- 複数カテゴリー対応 -->
+                    <div class="product-category-tag" th:text="${product.categoriesDisplay}">カテゴリー</div>
                     <h1 class="product-title" th:text="${product.name}">商品名</h1>
                     
                     <div class="product-price-section">

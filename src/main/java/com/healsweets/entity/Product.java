@@ -32,7 +32,16 @@ public class Product {
     @Column(nullable = false, precision = 10, scale = 0)
     private BigDecimal price;
 
-    @Column(length = 50)
+    // 複数カテゴリー対応（中間テーブル product_categories を使用）
+    @ElementCollection
+    @CollectionTable(name = "product_categories", joinColumns = @JoinColumn(name = "product_id"))
+    @Column(name = "category")
+    @Builder.Default
+    private List<String> categories = new ArrayList<>();
+
+    // 後方互換性のため、単一カテゴリーとしても取得可能
+    // ※ 旧categoryカラムは削除後、このメソッドはcategoriesの先頭を返す
+    @Column(name = "category", length = 50)
     private String category;
 
     @Column(length = 500)
@@ -86,5 +95,43 @@ public class Product {
 
     public String getFormattedPrice() {
         return "¥" + String.format("%,d", price.intValue());
+    }
+
+    /**
+     * カテゴリー表示用（複数の場合はカンマ区切り）
+     */
+    public String getCategoriesDisplay() {
+        if (categories == null || categories.isEmpty()) {
+            // 後方互換: 旧categoryカラムがあればそれを返す
+            return category != null ? getCategoryDisplayName(category) : "";
+        }
+        return categories.stream()
+                .map(this::getCategoryDisplayName)
+                .reduce((a, b) -> a + ", " + b)
+                .orElse("");
+    }
+
+    /**
+     * カテゴリーコードを表示名に変換
+     */
+    private String getCategoryDisplayName(String code) {
+        if (code == null) return "";
+        switch (code) {
+            case "allergen-free": return "アレルゲンフリー";
+            case "low-sugar": return "低糖質";
+            case "cacao": return "カカオ70%";
+            default: return code;
+        }
+    }
+
+    /**
+     * 指定カテゴリーに属するかチェック
+     */
+    public boolean hasCategory(String categoryCode) {
+        if (categories != null && !categories.isEmpty()) {
+            return categories.contains(categoryCode);
+        }
+        // 後方互換: 旧categoryカラムもチェック
+        return categoryCode != null && categoryCode.equals(category);
     }
 }
