@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注文詳細 - HealSweets</title>
+    <link rel="icon" type="image/png" th:href="@{/images/favicon.png}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/admin-style.css}">
+    <style>
+        /* リセット - 高さ制限を解除 */
+        .admin-container {
+            min-height: auto !important;
+            height: auto !important;
+        }
+        
+        .order-detail-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding-bottom: 50px;
+        }
+        
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #667eea;
+            text-decoration: none;
+            margin-bottom: 20px;
+            font-weight: 500;
+            padding: 8px 16px;
+            background: #f0f4ff;
+            border-radius: 8px;
+            transition: background-color 0.3s;
+        }
+        
+        .back-link:hover {
+            background: #e0e8ff;
+        }
+        
+        /* 注文ヘッダー */
+        .order-header-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 25px 30px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .order-header-info h1 {
+            margin: 0 0 8px 0;
+            font-size: 1.5em;
+        }
+        
+        .order-header-info p {
+            margin: 0;
+            opacity: 0.9;
+        }
+        
+        .order-header-status {
+            text-align: right;
+        }
+        
+        .order-header-status .status-badge {
+            font-size: 1.1em;
+            padding: 10px 20px;
+        }
+        
+        /* カード共通 */
+        .detail-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            margin-bottom: 25px;
+        }
+        
+        .detail-card-header {
+            background: #f8f9fa;
+            padding: 15px 25px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .detail-card-header h2 {
+            margin: 0;
+            font-size: 1.1em;
+            color: #2c3e50;
+        }
+        
+        .detail-card-body {
+            padding: 25px;
+        }
+        
+        /* 情報行 */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .info-label {
+            font-size: 0.85em;
+            color: #7f8c8d;
+            font-weight: 500;
+        }
+        
+        .info-value {
+            font-size: 1em;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        /* 商品リスト - 高さ制限なし */
+        .product-list {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+        }
+        
+        .product-item {
+            display: table;
+            width: 100%;
+            padding: 15px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            background: white;
+        }
+        
+        .product-item:last-child {
+            border-bottom: none;
+        }
+        
+        .product-item-inner {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .product-image {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+        
+        .product-info {
+            flex: 1;
+        }
+        
+        .product-name {
+            font-size: 1em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .product-price-info {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .product-unit-price {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        
+        .product-quantity {
+            color: #3498db;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        
+        .product-subtotal {
+            font-size: 1em;
+            font-weight: bold;
+            color: #2c3e50;
+            white-space: nowrap;
+            min-width: 80px;
+            text-align: right;
+        }
+        
+        /* 金額サマリー */
+        .price-summary {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .price-row:last-child {
+            border-bottom: none;
+        }
+        
+        .price-row.total {
+            border-top: 2px solid #667eea;
+            margin-top: 10px;
+            padding-top: 15px;
+        }
+        
+        .price-label {
+            color: #7f8c8d;
+            font-size: 1em;
+        }
+        
+        .price-value {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 1em;
+        }
+        
+        /* 配送先情報 - シンプルスタイル */
+        .shipping-info {
+            padding: 10px 0;
+        }
+        
+        .shipping-info .shipping-row {
+            display: flex;
+            padding: 8px 0;
+        }
+        
+        .shipping-info .shipping-label {
+            width: 100px;
+            color: #7f8c8d;
+            font-size: 0.9em;
+            flex-shrink: 0;
+        }
+        
+        .shipping-info .shipping-value {
+            color: #2c3e50;
+            font-weight: 500;
+        }
+        
+        /* ステータス更新 */
+        .status-update-section {
+            background: #f0f4ff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .status-update-section h3 {
+            margin: 0 0 15px 0;
+            color: #2c3e50;
+            font-size: 1em;
+        }
+        
+        .status-form {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .status-form select {
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            min-width: 200px;
+            cursor: pointer;
+        }
+        
+        .status-form select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .status-form button {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+        
+        .status-form button:hover {
+            opacity: 0.9;
+        }
+        
+        /* 2カラムレイアウト */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+        
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+            
+            .order-header-card {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .order-header-status {
+                text-align: center;
+            }
+            
+            .product-item-inner {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .product-subtotal {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragments/admin-header :: adminHeader}"></div>
+
+    <main class="admin-container">
+        <!-- メッセージ表示 -->
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
+
+        <div class="order-detail-container">
+            <!-- 戻るリンク -->
+            <a th:href="@{/admin/orders}" class="back-link">
+                ← 注文一覧に戻る
+            </a>
+            
+            <!-- 注文ヘッダー -->
+            <div class="order-header-card">
+                <div class="order-header-info">
+                    <h1>注文番号: <span th:text="${order.orderNumber}">HS1234567890</span></h1>
+                    <p>注文日時: <span th:text="${#temporals.format(order.createdAt, 'yyyy年M月d日 HH:mm')}">2025年1月1日 12:00</span></p>
+                </div>
+                <div class="order-header-status">
+                    <span class="status-badge" 
+                          th:classappend="${#strings.toLowerCase(order.status.name())}"
+                          th:text="${order.status.displayName}">処理中</span>
+                </div>
+            </div>
+
+            <!-- 注文商品 -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <span>🛒</span>
+                    <h2>注文商品</h2>
+                </div>
+                <div class="detail-card-body">
+                    <div class="product-list">
+                        <div th:each="item : ${order.orderItems}" class="product-item">
+                            <div class="product-item-inner">
+                                <img th:if="${item.product != null}" 
+                                     th:src="${item.product.imageUrl}" 
+                                     th:alt="${item.productName}" 
+                                     class="product-image" 
+                                     onerror="this.src='/images/logo.png'">
+                                <img th:unless="${item.product != null}" 
+                                     src="/images/logo.png" 
+                                     th:alt="${item.productName}" 
+                                     class="product-image">
+                                <div class="product-info">
+                                    <div class="product-name" th:text="${item.productName}">商品名</div>
+                                    <div class="product-price-info">
+                                        <span class="product-unit-price">単価: <span th:text="${item.formattedUnitPrice}">¥1,000</span></span>
+                                        <span class="product-quantity">× <span th:text="${item.quantity}">2</span>個</span>
+                                    </div>
+                                </div>
+                                <div class="product-subtotal" th:text="${item.formattedSubtotal}">¥2,000</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 金額サマリー -->
+                    <div class="price-summary">
+                        <div class="price-row">
+                            <span class="price-label">商品小計（<span th:text="${order.totalItemCount}">0</span>点）</span>
+                            <span class="price-value">¥<span th:text="${#numbers.formatInteger(order.subtotal, 0, 'COMMA')}">4,500</span></span>
+                        </div>
+                        <div class="price-row">
+                            <span class="price-label">送料</span>
+                            <span class="price-value">¥<span th:text="${#numbers.formatInteger(order.shippingFee, 0, 'COMMA')}">500</span></span>
+                        </div>
+                        <div class="price-row total">
+                            <span class="price-label">合計金額（税込）</span>
+                            <span class="price-value">¥<span th:text="${#numbers.formatInteger(order.totalAmount, 0, 'COMMA')}">5,000</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2カラムレイアウト -->
+            <div class="two-column">
+                <!-- 注文者情報 -->
+                <div class="detail-card">
+                    <div class="detail-card-header">
+                        <span>👤</span>
+                        <h2>注文者情報</h2>
+                    </div>
+                    <div class="detail-card-body">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">お名前</span>
+                                <span class="info-value" th:text="${order.member.fullName}">田中 太郎</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">会員ID</span>
+                                <span class="info-value" th:text="${order.member.id}">1</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">メールアドレス</span>
+                                <span class="info-value" th:text="${order.member.email}">tanaka@example.com</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">電話番号</span>
+                                <span class="info-value" th:text="${order.member.phone ?: '未登録'}">090-1234-5678</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 支払・配送情報 -->
+                <div class="detail-card">
+                    <div class="detail-card-header">
+                        <span>💳</span>
+                        <h2>支払・配送情報</h2>
+                    </div>
+                    <div class="detail-card-body">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">支払方法</span>
+                                <span class="info-value">
+                                    <span th:switch="${order.paymentMethod}">
+                                        <span th:case="'credit_card'">クレジットカード</span>
+                                        <span th:case="'bank_transfer'">銀行振込</span>
+                                        <span th:case="'convenience_store'">コンビニ決済</span>
+                                        <span th:case="'cod'">代金引換</span>
+                                        <span th:case="*" th:text="${order.paymentMethod}">-</span>
+                                    </span>
+                                </span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">配送オプション</span>
+                                <span class="info-value">
+                                    <span th:switch="${order.deliveryOption}">
+                                        <span th:case="'standard'">通常配送</span>
+                                        <span th:case="'express'">速達</span>
+                                        <span th:case="'date_specified'">日時指定</span>
+                                        <span th:case="*" th:text="${order.deliveryOption}">-</span>
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 配送先情報 -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <span>🚚</span>
+                    <h2>配送先情報</h2>
+                </div>
+                <div class="detail-card-body">
+                    <div class="shipping-info">
+                        <div class="shipping-row">
+                            <span class="shipping-label">お名前</span>
+                            <span class="shipping-value" th:text="${order.shippingName} + ' 様'">田中 太郎 様</span>
+                        </div>
+                        <div class="shipping-row">
+                            <span class="shipping-label">郵便番号</span>
+                            <span class="shipping-value">〒<span th:text="${order.shippingPostalCode}">123-4567</span></span>
+                        </div>
+                        <div class="shipping-row">
+                            <span class="shipping-label">住所</span>
+                            <span class="shipping-value" th:text="${order.shippingAddress}">東京都渋谷区...</span>
+                        </div>
+                        <div class="shipping-row">
+                            <span class="shipping-label">電話番号</span>
+                            <span class="shipping-value" th:text="${order.shippingPhone}">090-1234-5678</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ステータス更新 -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <span>⚙️</span>
+                    <h2>ステータス管理</h2>
+                </div>
+                <div class="detail-card-body">
+                    <div class="info-grid" style="margin-bottom: 20px;">
+                        <div class="info-item">
+                            <span class="info-label">現在のステータス</span>
+                            <span class="info-value">
+                                <span class="status-badge" 
+                                      th:classappend="${#strings.toLowerCase(order.status.name())}"
+                                      th:text="${order.status.displayName}">処理中</span>
+                            </span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">最終更新日時</span>
+                            <span class="info-value" th:text="${order.updatedAt != null ? #temporals.format(order.updatedAt, 'yyyy年M月d日 HH:mm') : '-'}">2025年1月1日 12:00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="status-update-section">
+                        <h3>ステータスを変更する</h3>
+                        <form th:action="@{/admin/orders/{id}/status(id=${order.id})}" method="post" class="status-form">
+                            <input type="hidden" name="returnTo" value="detail">
+                            <select name="status">
+                                <option th:each="s : ${statuses}" 
+                                        th:value="${s.name()}" 
+                                        th:text="${s.displayName}"
+                                        th:selected="${s == order.status}"></option>
+                            </select>
+                            <button type="submit">ステータスを更新</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

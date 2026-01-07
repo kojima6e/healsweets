@@ -133,6 +133,20 @@ public class Order {
     }
 
     /**
+     * 配送先住所を取得（都道府県、市区町村、番地を結合）
+     */
+    public String getShippingAddress() {
+        StringBuilder sb = new StringBuilder();
+        if (shippingPrefecture != null) sb.append(shippingPrefecture);
+        if (shippingCity != null) sb.append(shippingCity);
+        if (shippingAddress1 != null) sb.append(shippingAddress1);
+        if (shippingAddress2 != null && !shippingAddress2.isEmpty()) {
+            sb.append(" ").append(shippingAddress2);
+        }
+        return sb.toString();
+    }
+
+    /**
      * 注文内の全商品の合計数量を取得
      */
     public int getTotalItemCount() {
