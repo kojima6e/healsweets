@@ -20,22 +20,7 @@
             box-shadow: 0 0 0 3px rgba(74, 124, 89, 0.2);
         }
         
-        .category-card.selected::after {
-            content: '✓';
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background-color: #4a7c59;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 14px;
-        }
+
         
         .filter-info {
             text-align: center;
@@ -47,6 +32,115 @@
         .filter-info .selected-count {
             font-weight: bold;
             color: #4a7c59;
+        }
+        
+        /* ログインボタンスタイル */
+        .login-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background-color: #dc3545;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.9em;
+            transition: background-color 0.3s ease;
+        }
+        
+        .login-btn:hover {
+            background-color: #c82333;
+        }
+        
+        .login-btn-icon {
+            font-size: 1em;
+        }
+        
+        /* ヘッダーボタンスタイル */
+        .header-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 15px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.9em;
+            transition: background-color 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .header-btn-primary {
+            background-color: #4a7c59;
+            color: white;
+        }
+        
+        .header-btn-primary:hover {
+            background-color: #3a6349;
+        }
+        
+        .header-btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .header-btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .header-btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        .header-btn-danger:hover {
+            background-color: #c82333;
+        }
+        
+        /* カートボタンスタイル */
+        .cart-btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 15px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.9em;
+            transition: background-color 0.3s ease;
+            background-color: #17a2b8;
+            color: white;
+        }
+        
+        .cart-btn:hover {
+            background-color: #138496;
+        }
+        
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: #dc3545;
+            color: white;
+            font-size: 0.75em;
+            font-weight: bold;
+            min-width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+        }
+        
+        /* ログアウトフォーム */
+        .logout-form {
+            display: inline;
+            margin: 0;
+            padding: 0;
         }
     </style>
 </head>
@@ -61,14 +155,24 @@
                 </a>
             </div>
             <div class="header-icons">
-                <!-- 未ログイン時：ログインアイコン -->
-                <a sec:authorize="!isAuthenticated()" th:href="@{/login}" class="icon login-icon" title="ログイン">🔓</a>
+                <!-- 未ログイン時：ログインボタン -->
+                <a sec:authorize="!isAuthenticated()" th:href="@{/login}" class="login-btn">
+                    <span class="login-btn-icon">➜</span>
+                    <span>ログイン</span>
+                </a>
                 
                 <!-- ログイン時：マイページ、カート、ログアウト -->
-                <a sec:authorize="isAuthenticated()" th:href="@{/member}" class="icon" title="マイページ">👤</a>
-                <a sec:authorize="isAuthenticated()" th:href="@{/cart}" class="icon" title="カート">🛒</a>
+                <a sec:authorize="isAuthenticated()" th:href="@{/member}" class="header-btn header-btn-primary">
+                    <span>👤</span>
+                    <span>マイページ</span>
+                </a>
+                <a sec:authorize="isAuthenticated()" th:href="@{/cart}" class="cart-btn">
+                    <span>🛒</span>
+                    <span>カート</span>
+                    <span th:if="${cartItemCount > 0}" class="cart-badge" th:text="${cartItemCount}">0</span>
+                </a>
                 <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" class="logout-form">
-                    <button type="submit" class="logout-btn" title="ログアウト">🔐</button>
+                    <button type="submit" class="header-btn header-btn-danger">⬅ ログアウト</button>
                 </form>
             </div>
         </div>
