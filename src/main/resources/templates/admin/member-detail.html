@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>会員詳細 - HealSweets</title>
+    <link rel="icon" type="image/png" th:href="@{/images/favicon.png}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/admin-style.css}">
+    <style>
+        .member-detail-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #667eea;
+            text-decoration: none;
+            margin-bottom: 20px;
+            font-weight: 500;
+            padding: 8px 16px;
+            background: #f0f4ff;
+            border-radius: 8px;
+            transition: background-color 0.3s;
+        }
+        
+        .back-link:hover {
+            background: #e0e8ff;
+        }
+        
+        /* 会員ヘッダー */
+        .member-header-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 25px 30px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .member-header-info h1 {
+            margin: 0 0 8px 0;
+            font-size: 1.5em;
+        }
+        
+        .member-header-info p {
+            margin: 0;
+            opacity: 0.9;
+        }
+        
+        .member-header-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-edit {
+            padding: 10px 25px;
+            background: white;
+            color: #667eea;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .btn-edit:hover {
+            background: #f0f4ff;
+            transform: translateY(-2px);
+        }
+        
+        /* カード共通 */
+        .detail-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            margin-bottom: 25px;
+        }
+        
+        .detail-card-header {
+            background: #f8f9fa;
+            padding: 15px 25px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .detail-card-header h2 {
+            margin: 0;
+            font-size: 1.1em;
+            color: #2c3e50;
+        }
+        
+        .detail-card-body {
+            padding: 25px;
+        }
+        
+        /* 情報グリッド */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .info-grid.single-column {
+            grid-template-columns: 1fr;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .info-item.full-width {
+            grid-column: span 2;
+        }
+        
+        .info-label {
+            font-size: 0.85em;
+            color: #7f8c8d;
+            font-weight: 500;
+        }
+        
+        .info-value {
+            font-size: 1em;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        /* アレルギータグ */
+        .allergy-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .allergy-tag {
+            background: #fff3e0;
+            color: #e65100;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+        
+        .no-allergy {
+            color: #7f8c8d;
+            font-style: italic;
+        }
+        
+        /* ステータスバッジ */
+        .status-badge-large {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.95em;
+        }
+        
+        .status-badge-large.active {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .status-badge-large.inactive {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .badge-admin {
+            background: #667eea;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+        }
+        
+        .badge-user {
+            background: #e0e0e0;
+            color: #555;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+        }
+        
+        /* 2カラムレイアウト */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+        
+        @media (max-width: 768px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .info-item.full-width {
+                grid-column: span 1;
+            }
+            
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+            
+            .member-header-card {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragments/admin-header :: adminHeader}"></div>
+
+    <main class="admin-container">
+        <!-- メッセージ表示 -->
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
+
+        <div class="member-detail-container">
+            <!-- 戻るリンク -->
+            <a th:href="@{/admin/members}" class="back-link">
+                ← 会員一覧に戻る
+            </a>
+            
+            <!-- 会員ヘッダー -->
+            <div class="member-header-card">
+                <div class="member-header-info">
+                    <h1 th:text="${member.fullName}">田中 太郎</h1>
+                    <p>会員ID: <span th:text="${member.id}">1</span> | 登録日: <span th:text="${#temporals.format(member.createdAt, 'yyyy年M月d日')}">2025年1月1日</span></p>
+                </div>
+                <div class="member-header-actions">
+                    <a th:href="@{/admin/members/{id}/edit(id=${member.id})}" class="btn-edit">✏️ 編集</a>
+                </div>
+            </div>
+
+            <!-- 基本情報 -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <span>👤</span>
+                    <h2>基本情報</h2>
+                </div>
+                <div class="detail-card-body">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">氏名</span>
+                            <span class="info-value" th:text="${member.fullName}">田中 太郎</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">メールアドレス</span>
+                            <span class="info-value" th:text="${member.email}">tanaka@example.com</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">電話番号</span>
+                            <span class="info-value" th:text="${member.phone ?: '未登録'}">090-1234-5678</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">生年月日</span>
+                            <span class="info-value" th:text="${member.birthDate != null ? #temporals.format(member.birthDate, 'yyyy年M月d日') : '未登録'}">1990年1月1日</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2カラム: ステータス・住所 -->
+            <div class="two-column">
+                <!-- ステータス情報 -->
+                <div class="detail-card">
+                    <div class="detail-card-header">
+                        <span>⚙️</span>
+                        <h2>アカウント情報</h2>
+                    </div>
+                    <div class="detail-card-body">
+                        <div class="info-grid single-column">
+                            <div class="info-item">
+                                <span class="info-label">ステータス</span>
+                                <span class="info-value">
+                                    <span th:if="${member.enabled}" class="status-badge-large active">有効</span>
+                                    <span th:unless="${member.enabled}" class="status-badge-large inactive">無効</span>
+                                </span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">権限</span>
+                                <span class="info-value">
+                                    <span th:if="${member.isAdmin()}" class="badge-admin">管理者</span>
+                                    <span th:unless="${member.isAdmin()}" class="badge-user">一般会員</span>
+                                </span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">メルマガ購読</span>
+                                <span class="info-value" th:text="${member.newsletter ? '購読中' : '未購読'}">購読中</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">最終更新日</span>
+                                <span class="info-value" th:text="${#temporals.format(member.updatedAt, 'yyyy年M月d日 HH:mm')}">2025年1月1日 12:00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 住所情報 -->
+                <div class="detail-card">
+                    <div class="detail-card-header">
+                        <span>🏠</span>
+                        <h2>住所情報</h2>
+                    </div>
+                    <div class="detail-card-body">
+                        <div class="info-grid single-column">
+                            <div class="info-item">
+                                <span class="info-label">郵便番号</span>
+                                <span class="info-value" th:text="${member.postalCode != null ? '〒' + member.postalCode : '未登録'}">〒123-4567</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">都道府県</span>
+                                <span class="info-value" th:text="${member.prefecture ?: '未登録'}">東京都</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">市区町村</span>
+                                <span class="info-value" th:text="${member.city ?: '未登録'}">渋谷区</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">番地・建物名</span>
+                                <span class="info-value">
+                                    <span th:text="${member.address1 ?: '未登録'}">1-1-1</span>
+                                    <span th:if="${member.address2 != null and !member.address2.isEmpty()}" th:text="' ' + ${member.address2}"></span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- アレルギー情報 -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <span>⚠️</span>
+                    <h2>アレルギー情報</h2>
+                </div>
+                <div class="detail-card-body">
+                    <div th:if="${member.allergies != null and !member.allergies.isEmpty()}" class="allergy-tags">
+                        <span th:each="allergy : ${member.allergies}" class="allergy-tag" th:text="${allergy}">小麦</span>
+                    </div>
+                    <p th:if="${member.allergies == null or member.allergies.isEmpty()}" class="no-allergy">
+                        アレルギー情報は登録されていません
+                    </p>
+                </div>
+            </div>
+
+            <!-- 操作ボタン -->
+            <div class="detail-card">
+                <div class="detail-card-body" style="display: flex; gap: 15px; justify-content: center;">
+                    <a th:href="@{/admin/members/{id}/edit(id=${member.id})}" class="btn btn-primary">
+                        ✏️ 会員情報を編集
+                    </a>
+                    <form th:if="${member.enabled and !member.isAdmin()}" 
+                          th:action="@{/admin/members/{id}/delete(id=${member.id})}" 
+                          method="post" 
+                          style="display: inline;"
+                          onsubmit="return confirm('この会員を無効化してもよろしいですか？');">
+                        <button type="submit" class="btn btn-danger">🚫 無効化</button>
+                    </form>
+                    <form th:if="${!member.enabled}" 
+                          th:action="@{/admin/members/{id}/restore(id=${member.id})}" 
+                          method="post" 
+                          style="display: inline;">
+                        <button type="submit" class="btn btn-success">✅ 復元</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
