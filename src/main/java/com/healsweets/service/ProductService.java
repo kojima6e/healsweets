@@ -33,6 +33,18 @@ public class ProductService {
     }
 
     /**
+     * 在庫を戻す（キャンセル時など）
+     */
+    @Transactional
+    public void restoreStock(Long productId, int quantity) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("商品が見つかりません。"));
+        
+        product.setStock(product.getStock() + quantity);
+        productRepository.save(product);
+    }
+
+    /**
      * 在庫があるかチェック
      */
     public boolean hasStock(Long productId, int quantity) {

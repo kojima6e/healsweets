@@ -102,6 +102,20 @@ public class OrderService {
     public Order updateStatus(Long orderId, OrderStatus status) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("注文が見つかりません。"));
+        
+        OrderStatus previousStatus = order.getStatus();
+        
+        // キャンセルされた場合、在庫を戻す
+        // ただし、既にキャンセル済みの場合は二重に戻さないようにする
+        if (status == OrderStatus.CANCELLED && previousStatus != OrderStatus.CANCELLED) {
+            for (OrderItem orderItem : order.getOrderItems()) {
+                productService.restoreStock(
+                    orderItem.getProduct().getId(), 
+                    orderItem.getQuantity()
+                );
+            }
+        }
+        
         order.setStatus(status);
         return orderRepository.save(order);
     }
