@@ -189,9 +189,13 @@
 
     <!-- 検索バー -->
     <div class="search-container">
-        <form th:action="@{/search}" method="get">
-            <input type="text" name="keyword" placeholder="商品を検索" class="search-input" 
+        <form th:action="@{/search}" method="get" class="search-form">
+            <input type="text" name="keyword" placeholder="商品名・商品説明文で検索" class="search-input" 
                    th:value="${keyword}">
+            <button type="submit" class="search-btn">
+                <span class="search-icon">🔍</span>
+                <span class="search-text">検索</span>
+            </button>
         </form>
     </div>
 

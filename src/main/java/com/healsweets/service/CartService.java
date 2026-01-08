@@ -103,7 +103,10 @@ public class CartService {
 
     @Transactional(readOnly = true)
     public int getCartItemCount(Member member) {
-        return cartItemRepository.countByMember(member);
+        // カート内の商品の総個数を返す（各商品の数量の合計）
+        return getCartItems(member).stream()
+                .mapToInt(CartItem::getQuantity)
+                .sum();
     }
 
     public String getFormattedSubtotal(Member member) {

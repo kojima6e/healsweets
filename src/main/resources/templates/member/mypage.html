@@ -203,12 +203,8 @@
                                 <!-- キャンセルボタンエリア -->
                                 <!-- 処理中または確認済みの場合のみキャンセル可能 -->
                                 <div th:if="${order.status.name() == 'PENDING' || order.status.name() == 'CONFIRMED'}" class="order-cancel-section">
-                                    <form th:action="@{/member/orders/{id}/cancel(id=${order.id})}" method="post" class="cancel-form">
-                                        <button type="submit" class="order-cancel-btn" 
-                                                onclick="return confirm('この注文をキャンセルしますか？')">
-                                            注文をキャンセル
-                                        </button>
-                                    </form>
+                                    <button type="button" class="order-cancel-btn" 
+                                            th:onclick="'openCancelModal(' + ${order.id} + ')'">注文をキャンセル</button>
                                 </div>
                                 <!-- 発送済みの場合のみメッセージ表示（配達完了・キャンセル済みは表示しない） -->
                                 <div th:if="${order.status.name() == 'SHIPPED'}" class="order-cancel-section cancel-not-available">
@@ -385,9 +381,147 @@
             text-decoration: none;
             color: inherit;
         }
+
+        /* ===========================================
+           確認モーダルダイアログ
+           =========================================== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 90%;
+            transform: scale(0.9) translateY(-20px);
+            transition: transform 0.3s ease;
+            overflow: hidden;
+        }
+
+        .modal-overlay.active .modal-container {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-body {
+            padding: 30px;
+            text-align: center;
+        }
+
+        .modal-body p {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+            padding: 20px 30px 30px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn-cancel {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        .modal-btn-cancel:hover {
+            background: #e0e0e0;
+        }
+
+        .modal-btn-danger {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .modal-btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+        }
+
+        @media (max-width: 480px) {
+            .modal-container {
+                width: 95%;
+                margin: 10px;
+            }
+            
+            .modal-footer {
+                flex-direction: column;
+            }
+            
+            .modal-btn {
+                width: 100%;
+            }
+        }
     </style>
 
+    <!-- キャンセル確認モーダル -->
+    <div id="cancelModal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-body">
+                <p>注文をキャンセルしますか？</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="modal-btn modal-btn-cancel" onclick="closeCancelModal()">
+                    いいえ
+                </button>
+                <form id="cancelForm" method="post" style="display: inline;">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                    <button type="submit" class="modal-btn modal-btn-danger">
+                        キャンセルする
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // キャンセルモーダルを開く
+        function openCancelModal(orderId) {
+            var modal = document.getElementById('cancelModal');
+            var form = document.getElementById('cancelForm');
+            form.action = '/member/orders/' + orderId + '/cancel';
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // キャンセルモーダルを閉じる
+        function closeCancelModal() {
+            document.getElementById('cancelModal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
         // 会員情報の編集モード切り替え
         function toggleEditMode() {
             const viewMode = document.getElementById('info-view-mode');
@@ -408,6 +542,23 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
+            // モーダルのオーバーレイクリックで閉じる
+            const cancelModal = document.getElementById('cancelModal');
+            if (cancelModal) {
+                cancelModal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeCancelModal();
+                    }
+                });
+            }
+
+            // Escキーで閉じる
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeCancelModal();
+                }
+            });
+
             // アレルギーチェックボックスの選択状態を管理
             const checkboxItems = document.querySelectorAll('.checkbox-group .checkbox-item');
             checkboxItems.forEach(item => {

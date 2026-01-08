@@ -218,6 +218,158 @@
                 text-align: center;
             }
         }
+
+        /* ===========================================
+           確認モーダルダイアログ
+           =========================================== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 450px;
+            width: 90%;
+            transform: scale(0.9) translateY(-20px);
+            transition: transform 0.3s ease;
+            overflow: hidden;
+        }
+
+        .modal-overlay.active .modal-container {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-header {
+            text-align: center;
+            padding: 30px 30px 20px;
+            background: linear-gradient(135deg, #fff5f5 0%, #fff 100%);
+        }
+
+        .modal-icon {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+        }
+
+        .modal-icon.warning {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .modal-body {
+            padding: 25px 30px;
+            text-align: center;
+        }
+
+        .modal-member-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 0 0 15px 0;
+        }
+
+        .modal-description {
+            color: #666;
+            line-height: 1.7;
+            margin: 0 0 20px 0;
+        }
+
+        .modal-note {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 10px 18px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+        }
+
+        .note-icon {
+            font-size: 1.1rem;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+            padding: 20px 30px 30px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn-cancel {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        .modal-btn-cancel:hover {
+            background: #e0e0e0;
+        }
+
+        .modal-btn-danger {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .modal-btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+        }
+
+        @media (max-width: 480px) {
+            .modal-container {
+                width: 95%;
+                margin: 10px;
+            }
+            
+            .modal-footer {
+                flex-direction: column;
+            }
+            
+            .modal-btn {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -357,19 +509,17 @@
                 </div>
             </div>
 
-            <!-- 操作ボタン -->
-            <div class="detail-card">
+            <!-- 操作ボタン（無効化・復元が可能な場合のみ表示） -->
+            <div class="detail-card" th:if="${(member.enabled and !member.isAdmin()) or !member.enabled}">
                 <div class="detail-card-body" style="display: flex; gap: 15px; justify-content: center;">
-                    <a th:href="@{/admin/members/{id}/edit(id=${member.id})}" class="btn btn-primary">
-                        ✏️ 会員情報を編集
-                    </a>
-                    <form th:if="${member.enabled and !member.isAdmin()}" 
-                          th:action="@{/admin/members/{id}/delete(id=${member.id})}" 
-                          method="post" 
-                          style="display: inline;"
-                          onsubmit="return confirm('この会員を無効化してもよろしいですか？');">
-                        <button type="submit" class="btn btn-danger">🚫 無効化</button>
-                    </form>
+                    <!-- 無効化ボタン（モーダルを開く） -->
+                    <button th:if="${member.enabled and !member.isAdmin()}" 
+                            type="button" 
+                            class="btn btn-danger"
+                            onclick="openDeleteModal()">
+                        🚫 無効化
+                    </button>
+                    <!-- 復元ボタン -->
                     <form th:if="${!member.enabled}" 
                           th:action="@{/admin/members/{id}/restore(id=${member.id})}" 
                           method="post" 
@@ -379,6 +529,63 @@
                 </div>
             </div>
         </div>
+
+        <!-- 無効化確認モーダル -->
+        <div id="deleteModal" class="modal-overlay" th:if="${member.enabled and !member.isAdmin()}">
+            <div class="modal-container">
+                <div class="modal-body" style="padding-top: 30px;">
+                    <p style="font-size: 1.2rem; font-weight: bold; color: #2c3e50; margin: 0;">会員を無効化しますか？</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="modal-btn modal-btn-cancel" onclick="closeDeleteModal()">
+                        キャンセル
+                    </button>
+                    <form th:action="@{/admin/members/{id}/delete(id=${member.id})}" 
+                          method="post" 
+                          style="display: inline;">
+                        <button type="submit" class="modal-btn modal-btn-danger">
+                            🚫 無効化する
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </main>
+
+    <script>
+        // モーダルを開く
+        function openDeleteModal() {
+            var modal = document.getElementById('deleteModal');
+            if (modal) {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        // モーダルを閉じる
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // オーバーレイクリックで閉じる
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('deleteModal');
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeDeleteModal();
+                    }
+                });
+            }
+        });
+
+        // Escキーで閉じる
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeDeleteModal();
+            }
+        });
+    </script>
 </body>
 </html>
